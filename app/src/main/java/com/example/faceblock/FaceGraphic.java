@@ -53,6 +53,7 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private Paint mBoxPaint;
 
     private volatile Face mFace;
+    public Bitmap mFaceBitMap;
     private int mFaceId;
 
     FaceGraphic(GraphicOverlay overlay) {
@@ -116,8 +117,19 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     public Bitmap generateFaceThumbnail(Face face,
             Bitmap originalBitmap) throws IOException {
 
+        // Draws a circle at the position of the detected face, with the face's track id below.
+        float x = translateX(face.getPosition().x + face.getWidth() / 2);
+        float y = translateY(face.getPosition().y + face.getHeight() / 2);
+        // Draws a bounding box around the face.
+        float xOffset = scaleX(face.getWidth() / 2.0f);
+        float yOffset = scaleY(face.getHeight() / 2.0f);
+        float left = x - xOffset;
+        float top = y - yOffset;
+        float right = x + xOffset;
+        float bottom = y + yOffset;
+
         return Bitmap.createBitmap(
                 originalBitmap, Math.round(face.getPosition().x), Math.round(face.getPosition().y),
-                Math.round(face.getWidth()), Math.round(face.getHeight()));
+                Math.round(face.getHeight()), Math.round(face.getWidth()));
     }
 }
