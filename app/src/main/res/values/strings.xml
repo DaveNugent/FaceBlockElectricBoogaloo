@@ -1,10 +1,10 @@
 <resources>
     <string name="app_name">Faceblock</string>
-    <string name="subscription_key">ff216fcbc0c246edb0e29a70a45ee143</string>
-    <string name="endpoint">https://australiaeast.api.cognitive.microsoft.com/face/v1.0</string>
     <string name="preference_name">my_shared_preferences</string>
     <string name="person_group_id">person_group_id</string>
     <string name="group_name">group_name</string>
     <string name="person_group_name">Whitelist</string>
 
+    <string name="subscription_key">32a11b161c5d4cb1abb96cfe22ecbfc6</string>
+    <string name="endpoint">https://centralus.api.cognitive.microsoft.com/face/v1.0</string>
 </resources>
