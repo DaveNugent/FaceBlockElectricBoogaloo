@@ -23,8 +23,19 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.ImageFormat;
+import android.graphics.PixelFormat;
+import android.graphics.Point;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Camera;
 import android.hardware.display.DisplayManager;
 import android.hardware.display.VirtualDisplay;
+import android.media.Image;
+import android.media.ImageReader;
 import android.media.MediaRecorder;
 import android.media.projection.MediaProjection;
 import android.media.projection.MediaProjectionManager;
@@ -38,6 +49,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.SparseIntArray;
+import android.view.Display;
 import android.view.Surface;
 import android.view.View;
 import android.widget.Button;
@@ -51,8 +63,15 @@ import com.google.android.gms.vision.Tracker;
 import com.google.android.gms.vision.face.Face;
 import com.google.android.gms.vision.face.FaceDetector;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
@@ -84,6 +103,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     private static final int REQUEST_PERMISSION_KEY = 1;
     boolean isRecording = false;
     private String currFilePath;
+    private ImageReader imageReader;
+
 
     static {
         ORIENTATIONS.append(Surface.ROTATION_0, 90);
@@ -190,11 +211,13 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                 .setClassificationType(FaceDetector.ALL_CLASSIFICATIONS)
                 .build();
 
-        detector.setProcessor(
+        MyFaceDetector myFaceDetector = new MyFaceDetector(detector);
+
+        myFaceDetector.setProcessor(
                 new MultiProcessor.Builder<>(new GraphicFaceTrackerFactory())
                         .build());
 
-        if (!detector.isOperational()) {
+        if (!myFaceDetector.isOperational()) {
             // Note: The first time that an app using face API is installed on a device, GMS will
             // download a native library to the device in order to do detection.  Usually this
             // completes before the app is run for the first time.  But if that download has not yet
@@ -206,7 +229,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             Log.w(TAG, "Face detector dependencies are not yet available.");
         }
 
-        mCameraSource = new CameraSource.Builder(context, detector)
+        mCameraSource = new CameraSource.Builder(context, myFaceDetector)
                 .setRequestedPreviewSize(640, 480)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
                 .setRequestedFps(30.0f)
@@ -363,8 +386,72 @@ public final class FaceTrackerActivity extends AppCompatActivity {
          */
         @Override
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
+
             mOverlay.add(mFaceGraphic);
             mFaceGraphic.updateFace(face);
+            Bitmap FaceThumbNail = null;
+
+
+            try {
+                Bitmap faceBit = MyFaceDetector.getLastBitmap();
+
+                //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
+                if (faceBit == null){
+                    System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
+                }
+                FaceThumbNail = mFaceGraphic.generateFaceThumbnail(face, faceBit);
+            }catch (Exception e){
+                System.out.println("failed to get thumbnail *** " + e.toString());
+                //FIXME probably do something
+            }
+            //FIXME
+            if (FaceThumbNail != null) {
+                storeImage(FaceThumbNail);
+            }
+        }
+
+        private void storeImage(Bitmap image) {
+            File pictureFile = getOutputMediaFile();
+            if (pictureFile == null) {
+                Log.d("myFaceDetector",
+                        "Error creating media file, check storage permissions: ");// e.getMessage());
+                return;
+            }
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+                image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+                fos.close();
+            } catch (FileNotFoundException e) {
+                Log.d("myFaceDetector", "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d("myFaceDetector", "Error accessing file: " + e.getMessage());
+            }
+        }
+
+        /** Create a File for saving an image or video */
+        private  File getOutputMediaFile(){
+            // To be safe, you should check that the SDCard is mounted
+            // using Environment.getExternalStorageState() before doing this.
+            File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
+                    + "/Android/data/"
+                    + "FaceBlock"
+                    + "/Files");
+
+            // This location works best if you want the created images to be shared
+            // between applications and persist after your app has been uninstalled.
+
+            // Create the storage directory if it does not exist
+            if (! mediaStorageDir.exists()){
+                if (! mediaStorageDir.mkdirs()){
+                    return null;
+                }
+            }
+            // Create a media file name
+            String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
+            File mediaFile;
+            String mImageName="MI_"+ timeStamp +".jpg";
+            mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
+            return mediaFile;
         }
 
         /**
@@ -419,6 +506,15 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     }
 
     private VirtualDisplay createVirtualDisplay() {
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        int displayWidth = size.x;
+        int displayHeight = size.y;
+
+        imageReader = ImageReader.newInstance(displayWidth, displayHeight, ImageFormat.JPEG, 5);
+
         return mMediaProjection.createVirtualDisplay("MainActivity", DISPLAY_WIDTH, DISPLAY_HEIGHT, mScreenDensity,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_AUTO_MIRROR, mMediaRecorder.getSurface(), null, null);
     }
@@ -427,15 +523,15 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         try {
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
+            //mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             Long currTime = System.currentTimeMillis();
             String fileName = "/" + String.valueOf(currTime) + "_video.mp4";
-            mMediaRecorder.setOutputFile(Environment.getExternalStorageDirectory() + fileName);
+            mMediaRecorder.setOutputFile(Environment.getExternalStorageDirectory() +  fileName);
             currFilePath = (Environment.getExternalStorageDirectory() + fileName);
             mMediaRecorder.setVideoSize(DISPLAY_WIDTH, DISPLAY_HEIGHT);
             mMediaRecorder.setVideoEncoder(MediaRecorder.VideoEncoder.H264);
             mMediaRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AMR_NB);
-            mMediaRecorder.setVideoEncodingBitRate(512 * 1000);
             mMediaRecorder.setVideoFrameRate(16); // 30
             mMediaRecorder.setVideoEncodingBitRate(3000000);
             int rotation = getWindowManager().getDefaultDisplay().getRotation();
@@ -541,6 +637,17 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
     }
+
+    public static byte[] getDataFromImage(Image image) {
+        Image.Plane[] planes = image.getPlanes();
+        ByteBuffer buffer = planes[0].getBuffer();
+        byte[] data = new byte[buffer.capacity()];
+        buffer.get(data);
+
+        return data;
+    }
+
+
 }
 
 
