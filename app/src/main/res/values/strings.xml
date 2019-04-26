@@ -1,5 +1,5 @@
 <resources>
     <string name="app_name">Faceblock</string>
-    <string name="subscription_key">ff216fcbc0c246edb0e29a70a45ee143</string>
-    <string name="endpoint">https://australiaeast.api.cognitive.microsoft.com/face/v1.0</string>
+    <string name="subscription_key">32a11b161c5d4cb1abb96cfe22ecbfc6</string>
+    <string name="endpoint">https://centralus.api.cognitive.microsoft.com/face/v1.0</string>
 </resources>
