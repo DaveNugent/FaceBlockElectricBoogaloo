@@ -34,9 +34,11 @@ import android.content.SharedPreferences;
 
 import com.example.faceblock.helper.SampleApp;
 
+import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;
 //     import com.microsoft.projectoxford.face.samples.R;
     import com.example.faceblock.helper.LogHelper;
+import com.microsoft.projectoxford.face.contract.CreatePersonResult;
 //     import com.microsoft.projectoxford.face.samples.helper.SampleApp;
 //     import com.microsoft.projectoxford.face.samples.helper.StorageHelper;
 
@@ -49,15 +51,13 @@ import java.util.UUID;
 import android.content.Context;
 
 
-public class PersonGroupManager {
-
-
-    String groupIdKey = getString(R.string.person_group_id);
-    String groupNameKey = getString(R.string.group_name);
-    SharedPreferences mPrefs = Context.getSharedPreferences( getString(R.string.preference_name), Context.MODE_PRIVATE);
-
+public class PersonGroupManager extends AppCompatActivity{
     String personGroupId;
     String personGroupName;
+    String personId;
+
+    public static final int PICK_IMAGE = 1;
+    public static final int USE_CAMERA = 101;
 
     FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
 
@@ -112,37 +112,123 @@ public class PersonGroupManager {
         }
     }
 
+    class AddPersonTask extends AsyncTask<String, String, String> {
+        // Indicate the next step is to add face in this person, or finish editing this person.
+
+        AddPersonTask () {}
+
+        @Override
+        protected String doInBackground(String... params) {
+            // Get an instance of face service client.
+            FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
+            try{
+                publishProgress("Syncing with server to add person...");
+
+                // Start the request to creating person.
+                CreatePersonResult createPersonResult = faceServiceClient.createPersonInLargePersonGroup(
+                        params[0],
+                        "Name",
+                        "Person Info");
+
+                return createPersonResult.personId.toString();
+            } catch (Exception e) {
+                publishProgress(e.getMessage());
+                return null;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            if (result != null) {
+                personId = result;
+
+            }
+        }
+    }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_wl);
 
-        personGroupId = mPrefs.getString(groupIdKey, " ");
-        personGroupName = mPrefs.getString(groupNameKey, " ");
+        personGroupId = StorageHelper.getPersonGroupId(PersonGroupManager.this);
+        personGroupName = StorageHelper.getPersonGroupName(PersonGroupManager.this);
 
-        if(personGroupId == null){
-            personGroupId = UUID.randomUUID().toString();
-            personGroupName = getString(R.string.person_group_name);
-
-            SharedPreferences.Editor mEditor = mPrefs.edit();
-            mEditor.clear();
-
-            mEditor.putString(groupIdKey, personGroupId);
-            mEditor.putString(groupNameKey, personGroupId);
-            mEditor.commit();
-
-            new AddPersonGroupTask(false).execute(personGroupId);
+        if(personGroupId.equals(" ")){
+            createPersonGroup();
         }
-
-
-
-
 
 
     }
 
-    private String getString(int string){
-        return Resources.getSystem().getString(string);
+    public void onTakePictureClicked(View v) {
+
+        EditText editTextPersonName = (EditText)findViewById(R.id.edit_person_name);
+        String name = editTextPersonName.getText().toString();
+
+        if(!isNameEmpty(name)){
+            if(doesPersonExist()){
+
+            }
+            else {
+                new AddPersonTask().execute(personGroupId);
+            }
+        }
+    }
+    public void onAddFromGalleryClicked(View v) {
+
+        EditText editTextPersonName = (EditText)findViewById(R.id.edit_person_name);
+        String name = editTextPersonName.getText().toString();
+
+        if(!isNameEmpty(name)){
+            if(doesPersonExist()){
+
+            }
+            else {
+                new AddPersonTask().execute(personGroupId);
+            }
+        }
+    }
+    }
+    public void onResetClicked(View v) {
+
+
+    }
+
+    public void createPersonGroup() {
+        personGroupId = UUID.randomUUID().toString();
+        personGroupName = getString(R.string.person_group_name);
+
+        StorageHelper.setPersonGroupId(personGroupId, PersonGroupManager.this);
+        StorageHelper.setPersonGroupName(personGroupName, PersonGroupManager.this);
+
+        new AddPersonGroupTask(false).execute(personGroupId);
+    }
+
+    public boolean isNameEmpty(String newPersonName) {
+
+        if (newPersonName.equals("")) {
+            return true;
+        }
+        else {
+            return false;
+        }
+
+    }
+
+    public boolean doesPersonExist(){
+        EditText editTextPersonName = (EditText)findViewById(R.id.edit_person_name);
+        String newPersonName = editTextPersonName.getText().toString();
+        Set<String> personNames = StorageHelper.getAllPersonNames(PersonGroupManager.this);
+        for (String name: personNames){
+            if(name.equals(newPersonName)){
+                return true;
+            }
+        }
+        return false;
+
     }
 
 

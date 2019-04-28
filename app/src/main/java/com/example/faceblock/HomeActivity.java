@@ -1,5 +1,6 @@
 package com.example.faceblock;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,10 +12,12 @@ public class HomeActivity extends AppCompatActivity {
 
     Button btnCamera;
     Button btnAddWL;
+    public static Context contextOfApplication;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        contextOfApplication = getApplicationContext();
         setContentView(R.layout.activity_home);
 
         btnAddWL = findViewById(R.id.btnAddWL);
@@ -35,5 +38,9 @@ public class HomeActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    public static Context getContext(){
+        return contextOfApplication;
     }
 }

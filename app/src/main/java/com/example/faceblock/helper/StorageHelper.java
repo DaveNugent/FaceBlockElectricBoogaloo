@@ -43,96 +43,73 @@ import java.util.Set;
  * Defined several functions to manage local storage.
  */
 public class StorageHelper {
-    public static Set<String> getAllPersonGroupIds(Context context) {
-        SharedPreferences personGroupIdSet =
-                context.getSharedPreferences("PersonGroupIdSet", Context.MODE_PRIVATE);
-        return personGroupIdSet.getStringSet("PersonGroupIdSet", new HashSet<String>());
+    public static String getPersonGroupId(Context context) {
+        SharedPreferences personGroup =
+                context.getSharedPreferences("PersonGroup", Context.MODE_PRIVATE);
+        return personGroup.getString("PersonGroupId", " ");
     }
 
-    public static String getPersonGroupName(String personGroupId, Context context) {
-        SharedPreferences personGroupIdNameMap =
-                context.getSharedPreferences("PersonGroupIdNameMap", Context.MODE_PRIVATE);
-        return personGroupIdNameMap.getString(personGroupId, "");
-    }
-
-    public static void setPersonGroupName(String personGroupIdToAdd, String personGroupName, Context context) {
-        SharedPreferences personGroupIdNameMap =
+    public static void setPersonGroupId(String personGroupId, Context context) {
+        SharedPreferences personGroup =
                 context.getSharedPreferences("PersonGroupIdNameMap", Context.MODE_PRIVATE);
 
-        SharedPreferences.Editor personGroupIdNameMapEditor = personGroupIdNameMap.edit();
-        personGroupIdNameMapEditor.putString(personGroupIdToAdd, personGroupName);
-        personGroupIdNameMapEditor.commit();
+        SharedPreferences.Editor personGroupEditor = personGroup.edit();
+        personGroupEditor.putString("PersonGroupId", personGroupId);
+        personGroupEditor.commit();
 
-        Set<String> personGroupIds = getAllPersonGroupIds(context);
-        Set<String> newPersonGroupIds = new HashSet<>();
-        for (String personGroupId: personGroupIds) {
-            newPersonGroupIds.add(personGroupId);
-        }
-        newPersonGroupIds.add(personGroupIdToAdd);
-        SharedPreferences personGroupIdSet =
-                context.getSharedPreferences("PersonGroupIdSet", Context.MODE_PRIVATE);
-        SharedPreferences.Editor personGroupIdSetEditor = personGroupIdSet.edit();
-        personGroupIdSetEditor.putStringSet("PersonGroupIdSet", newPersonGroupIds);
-        personGroupIdSetEditor.commit();
     }
 
-    public static void deletePersonGroups(List<String> personGroupIdsToDelete, Context context) {
-        SharedPreferences personGroupIdNameMap =
+    public static String getPersonGroupName(Context context) {
+        SharedPreferences personGroup =
+                context.getSharedPreferences("PersonGroup", Context.MODE_PRIVATE);
+        return personGroup.getString("GroupName", "");
+    }
+
+    public static void setPersonGroupName(String personGroupName, Context context) {
+        SharedPreferences personGroup =
                 context.getSharedPreferences("PersonGroupIdNameMap", Context.MODE_PRIVATE);
-        SharedPreferences.Editor personGroupIdNameMapEditor = personGroupIdNameMap.edit();
-        for (String personGroupId: personGroupIdsToDelete) {
-            personGroupIdNameMapEditor.remove(personGroupId);
-        }
-        personGroupIdNameMapEditor.commit();
 
-        Set<String> personGroupIds = getAllPersonGroupIds(context);
-        Set<String> newPersonGroupIds = new HashSet<>();
-        for (String personGroupId: personGroupIds) {
-            if (!personGroupIdsToDelete.contains(personGroupId)) {
-                newPersonGroupIds.add(personGroupId);
-            }
-        }
-        SharedPreferences personGroupIdSet =
-                context.getSharedPreferences("PersonGroupIdSet", Context.MODE_PRIVATE);
-        SharedPreferences.Editor personGroupIdSetEditor = personGroupIdSet.edit();
-        personGroupIdSetEditor.putStringSet("PersonGroupIdSet", newPersonGroupIds);
-        personGroupIdSetEditor.commit();
+        SharedPreferences.Editor personGroupEditor = personGroup.edit();
+        personGroupEditor.putString("GroupName", personGroupName);
+        personGroupEditor.commit();
+
     }
 
-    public static Set<String> getAllPersonIds(String personGroupId, Context context) {
-        SharedPreferences personIdSet =
-                context.getSharedPreferences(personGroupId + "PersonIdSet", Context.MODE_PRIVATE);
-        return personIdSet.getStringSet("PersonIdSet", new HashSet<String>());
+
+    public static Set<String> getAllPersonNames(Context context) {
+        SharedPreferences personNameSet =
+                context.getSharedPreferences("PersonNameSet", Context.MODE_PRIVATE);
+        return personNameSet.getStringSet("PersonNameSet", new HashSet<String>());
     }
 
-    public static String getPersonName(String personId, String personGroupId, Context context) {
+    public static String getPersonId(String personName, Context context) {
         SharedPreferences personIdNameMap =
-                context.getSharedPreferences(personGroupId + "PersonIdNameMap", Context.MODE_PRIVATE);
-        return personIdNameMap.getString(personId, "");
+                context.getSharedPreferences("PersonIdNameMap", Context.MODE_PRIVATE);
+        return personIdNameMap.getString(personName, " ");
     }
 
-    public static void setPersonName(String personIdToAdd, String personName, String personGroupId, Context context) {
+    public static void addPerson(String personName, String personId, Context context) {
         SharedPreferences personIdNameMap =
-                context.getSharedPreferences(personGroupId + "PersonIdNameMap", Context.MODE_PRIVATE);
+                context.getSharedPreferences("PersonIdNameMap", Context.MODE_PRIVATE);
 
         SharedPreferences.Editor personIdNameMapEditor = personIdNameMap.edit();
-        personIdNameMapEditor.putString(personIdToAdd, personName);
+        personIdNameMapEditor.putString(personName, personId);
         personIdNameMapEditor.commit();
 
-        Set<String> personIds = getAllPersonIds(personGroupId, context);
-        Set<String> newPersonIds = new HashSet<>();
-        for (String personId: personIds) {
-            newPersonIds.add(personId);
+        Set<String> personNames = getAllPersonNames(context);
+        Set<String> newPersonNames = new HashSet<>();
+        for (String name: personNames) {
+            newPersonNames.add(name);
         }
-        newPersonIds.add(personIdToAdd);
-        SharedPreferences personIdSet =
-                context.getSharedPreferences(personGroupId + "PersonIdSet", Context.MODE_PRIVATE);
-        SharedPreferences.Editor personIdSetEditor = personIdSet.edit();
-        personIdSetEditor.putStringSet("PersonIdSet", newPersonIds);
-        personIdSetEditor.commit();
+        newPersonNames.add(personName);
+        SharedPreferences personNameSet =
+                context.getSharedPreferences("PersonNameSet", Context.MODE_PRIVATE);
+        SharedPreferences.Editor personNameSetEditor = personNameSet.edit();
+        personNameSetEditor.putStringSet("PersonNameSet", newPersonNames);
+        personNameSetEditor.commit();
     }
 
-    public static void deletePersons(List<String> personIdsToDelete, String personGroupId, Context context) {
+    /*public static void deletePersons(List<String> personIdsToDelete, String personGroupId, Context context) {
         SharedPreferences personIdNameMap =
                 context.getSharedPreferences(personGroupId + "PersonIdNameMap", Context.MODE_PRIVATE);
         SharedPreferences.Editor personIdNameMapEditor = personIdNameMap.edit();
@@ -153,7 +130,7 @@ public class StorageHelper {
         SharedPreferences.Editor personIdSetEditor = personIdSet.edit();
         personIdSetEditor.putStringSet("PersonIdSet", newPersonIds);
         personIdSetEditor.commit();
-    }
+    } */
 
     public static Set<String> getAllFaceIds(String personId, Context context) {
         SharedPreferences faceIdSet =
