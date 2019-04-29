@@ -81,7 +81,7 @@ public class HomeActivity extends AppCompatActivity {
         btnAddWL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, AddWLActivity.class);
+                Intent intent = new Intent(HomeActivity.this, PersonGroupManager.class);
                 startActivity(intent);
             }
         });

@@ -4,4 +4,8 @@
     <string name="person_group_name">Whitelist</string>
     <string name="subscription_key">32a11b161c5d4cb1abb96cfe22ecbfc6</string>
     <string name="endpoint">https://centralus.api.cognitive.microsoft.com/face/v1.0</string>
+
+    <string name="progress_dialog_title">Please wait</string>
+    <string name="done_and_save">Save</string>
+    <string name="select_face_tip">Select this person\'s faces (if exist) by click on the checkbox.</string>
 </resources>
