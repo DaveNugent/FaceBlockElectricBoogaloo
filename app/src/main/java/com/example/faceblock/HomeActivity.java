@@ -104,8 +104,4 @@ public class HomeActivity extends AppCompatActivity {
 
         new HomeActivity.AddPersonGroupTask().execute(personGroupId);
     }
-
-    public static Context getContext(){
-        return App;
-    }
 }
