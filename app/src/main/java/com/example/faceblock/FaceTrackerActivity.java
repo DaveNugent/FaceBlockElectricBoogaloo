@@ -405,9 +405,13 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                 //FIXME probably do something
             }
             //FIXME
-            if (FaceThumbNail != null) {
+            /*if (FaceThumbNail != null) {
                 storeImage(FaceThumbNail);
-            }
+            }*/
+            try {
+                WhitelistChecker mTask = new WhitelistChecker();
+                mTask.detect(FaceThumbNail);
+            } catch(Exception e){}
         }
 
         private void storeImage(Bitmap image) {
