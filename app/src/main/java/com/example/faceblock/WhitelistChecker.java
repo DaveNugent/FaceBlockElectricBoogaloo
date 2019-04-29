@@ -8,6 +8,7 @@ import android.os.Bundle;
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.Face;
 import com.microsoft.projectoxford.face.contract.IdentifyResult;
+import com.microsoft.projectoxford.face.contract.TrainingStatus;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,22 +24,31 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
 
     String mPersonGroupId; //= getPersongroupID
 
+    private boolean mSucceed = true;
     boolean detected;
-
 
     @Override
     protected IdentifyResult[] doInBackground(UUID... params) {
 
         FaceServiceClient faceServiceClient = FaceServiceHelper.getFaceServiceClient();
+        //FIXME
+        //mPersonGroupId = StorageHelper.getPersonGroupId()
 
-        try{
+        try {
             //API call
             //Inputs
             //personGroupID
             //faceIDs
             //MaxNumOfCandidatesReturned
-            return faceServiceClient.identityInLargePersonGroup(this.mPersonGroupId, params, 1);
+            TrainingStatus trainingStatus = faceServiceClient.getPersonGroupTrainingStatus(this.mPersonGroupId);
+            if (trainingStatus.status != TrainingStatus.Status.Succeeded) {
+                mSucceed = false;
+                return null;
+            }
+
+            return faceServiceClient.identityInPersonGroup(this.mPersonGroupId, params, 1);
         } catch (Exception e) {
+            mSucceed = false;
             return null;
         }
     }
@@ -50,8 +60,7 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
     //Checks through Azure API to see if it is on whitelist or not
     //some method that takes a bitmap as an input param (cut out face from Dave's stuff)
     //returns a boolean based on if this face is in the list or not
-    public boolean isOnWhiteList(Bitmap faceThumbnail)
-    {
+    public boolean isOnWhiteList(Bitmap faceThumbnail) {
 
 
         boolean isOnList = false;
@@ -63,8 +72,7 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
 
     }
 
-    private boolean detect(Bitmap faceThumbnail)
-    {
+    private boolean detect(Bitmap faceThumbnail) {
         boolean isOnList = false;
 
         //We need to put the bitmap into an input stream for detection
@@ -79,16 +87,16 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
         return isOnList;
     }
 
-    private class DetectionTask extends AsyncTask<InputStream, String, Face[]>{
+    private class DetectionTask extends AsyncTask<InputStream, String, Face[]> {
         @Override
-        protected Face[] doInBackground(InputStream... params){
+        protected Face[] doInBackground(InputStream... params) {
             //Get an instance of face service client to detect faces in image
 
             //FIXME
             FaceServiceClient faceServiceClient = FaceServiceHelper.getFaceServiceClient();
 
 
-            try{
+            try {
                 //API call to detect face
                 //Inputs
                 //params[0]:            stream of image to detect
@@ -97,30 +105,14 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
                 //faceAttributeTypes:   which face attributes to analyze
                 return faceServiceClient.detect(params[0], true, false, null);
 
-            }   catch (Exception e) {
+            } catch (Exception e) {
                 publishProgress(e.getMessage());
                 return null;
             }
         }
 
-        private static final int REQUEST_SELECT_IMAGE = 0;
-
-        @Override
-        protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-            switch (requestCode)
-            {
-                case REQUEST_SELECT_IMAGE:
-                    if(resultCode == RESULT_OK) {
-                        detected = false;
-
-                        //detect(
-                    }
-            }
-        }
+        //if face is on whitelist, return true
+        //else return false
 
     }
-
-    //if face is on whitelist, return true
-    //else return false
-
 }
