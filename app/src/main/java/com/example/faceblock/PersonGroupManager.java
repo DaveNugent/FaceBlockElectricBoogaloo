@@ -39,11 +39,8 @@ import com.example.faceblock.helper.SampleApp;
 
 import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;
-//     import com.microsoft.projectoxford.face.samples.R;
-    import com.example.faceblock.helper.LogHelper;
 import com.microsoft.projectoxford.face.contract.CreatePersonResult;
-//     import com.microsoft.projectoxford.face.samples.helper.SampleApp;
-//     import com.microsoft.projectoxford.face.samples.helper.StorageHelper;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -84,9 +81,9 @@ public class PersonGroupManager extends AppCompatActivity{
     //Taken and modified from Cognitive-Face sample android studio project //
     ////////////////////////////////////////////////////////////////////////
 
-    /*
-     * Task taken from PersonGroupActivity to set up a person group in Azure
-     */
+
+     // Task taken from PersonGroupActivity to set up a person group in Azure
+
     class AddPersonGroupTask extends AsyncTask<String, String, String> {
         // Indicate the next step is to add person in this group, or finish editing this group.
 
@@ -122,9 +119,9 @@ public class PersonGroupManager extends AppCompatActivity{
         }
     }
 
-    /*
-     * Task taken from PersonActivity to add a person to the person group
-     */
+
+     // Task taken from PersonActivity to add a person to the person group
+
 
     class AddPersonTask extends AsyncTask<String, String, String> {
         // Indicate the next step is to add face in this person, or finish editing this person.
@@ -163,9 +160,9 @@ public class PersonGroupManager extends AppCompatActivity{
         }
     }
 
-    /*
-     * Methods bellow taken from SelectImageActivity to get face image to apply to person
-     */
+
+     // Methods bellow taken from SelectImageActivity to get face image to apply to person
+
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -196,14 +193,20 @@ public class PersonGroupManager extends AppCompatActivity{
 
                     imageUriStr = imageUri.toString();
 
-                    /*
+                    Intent intent = new Intent(this, AddFaceToPersonActivity.class);
+                    intent.putExtra("PersonId", personId);
+                    intent.putExtra("PersonGroupId", personGroupId);
+                    intent.putExtra("ImageUriStr", imageUriStr);
+                    startActivity(intent);
 
-                    Intent intent = new Intent();
-                    intent.setData(imageUri);
-                    setResult(RESULT_OK, intent);
-                    finish();
 
-                    */
+
+//                    Intent intent = new Intent();
+//                    intent.setData(imageUri);
+ //                   setResult(RESULT_OK, intent);
+ //                   finish();
+
+
                 }
                 break;
             default:
