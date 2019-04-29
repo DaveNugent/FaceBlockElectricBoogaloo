@@ -2,6 +2,8 @@ package com.example.faceblock;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.os.Environment;
+import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
 
 import android.app.ProgressDialog;
@@ -42,6 +44,8 @@ import com.microsoft.projectoxford.face.contract.CreatePersonResult;
 //     import com.microsoft.projectoxford.face.samples.helper.SampleApp;
 //     import com.microsoft.projectoxford.face.samples.helper.StorageHelper;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -54,7 +58,17 @@ import android.content.Context;
 public class PersonGroupManager extends AppCompatActivity{
     String personGroupId;
     String personGroupName;
+    String personName;
     String personId;
+    boolean personReady;
+    boolean prevFaceAdded;
+
+    private static final int REQUEST_TAKE_PHOTO = 0;
+    private static final int REQUEST_SELECT_IMAGE_IN_ALBUM = 1;
+
+    // The URI of photo taken with camera
+    private Uri mUriPhotoTaken;
+
 
     public static final int PICK_IMAGE = 1;
     public static final int USE_CAMERA = 101;
@@ -63,17 +77,13 @@ public class PersonGroupManager extends AppCompatActivity{
 
     class AddPersonGroupTask extends AsyncTask<String, String, String> {
         // Indicate the next step is to add person in this group, or finish editing this group.
-        boolean mAddPerson;
 
-        AddPersonGroupTask(boolean addPerson) {
-            mAddPerson = addPerson;
-        }
+        AddPersonGroupTask() { }
 
         @Override
         protected String doInBackground(String... params) {
 
             // Get an instance of face service client.
-            FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
             try{
                 publishProgress("Syncing with server to add person group...");
 
@@ -96,18 +106,6 @@ public class PersonGroupManager extends AppCompatActivity{
 
             if (result != null) {
 
-                personGroupExists = true;
-                GridView gridView = (GridView) findViewById(R.id.gridView_persons);
-                personGridViewAdapter = new PersonGridViewAdapter();
-                gridView.setAdapter(personGridViewAdapter);
-
-                setInfo("Success. Group " + result + " created");
-
-                if (mAddPerson) {
-                    addPerson();
-                } else {
-                    doneAndSave(false);
-                }
             }
         }
     }
@@ -142,10 +140,80 @@ public class PersonGroupManager extends AppCompatActivity{
 
             if (result != null) {
                 personId = result;
+                StorageHelper.addPerson(personName, personId, HomeActivity.App);
+                personReady = true;
 
             }
         }
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode)
+        {
+            case REQUEST_TAKE_PHOTO:
+            case REQUEST_SELECT_IMAGE_IN_ALBUM:
+                if (resultCode == RESULT_OK) {
+                    Uri imageUri;
+                    if (data == null || data.getData() == null) {
+                        imageUri = mUriPhotoTaken;
+                    } else {
+                        imageUri = data.getData();
+                    }
+                    Intent intent = new Intent();
+                    intent.setData(imageUri);
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    // When the button of "Take a Photo with Camera" is pressed.
+    public void takePhoto() {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if(intent.resolveActivity(getPackageManager()) != null) {
+            // Save the photo taken to a temporary file.
+            File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+            try {
+                File file = File.createTempFile("IMG_", ".jpg", storageDir);
+                mUriPhotoTaken = Uri.fromFile(file);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, mUriPhotoTaken);
+                startActivityForResult(intent, REQUEST_TAKE_PHOTO);
+            } catch (IOException e) {
+
+            }
+        }
+    }
+
+    // When the button of "Select a Photo in Album" is pressed.
+    public void selectImageInAlbum() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("image/*");
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, REQUEST_SELECT_IMAGE_IN_ALBUM);
+        }
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
     @Override
@@ -153,8 +221,8 @@ public class PersonGroupManager extends AppCompatActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_add_wl);
 
-        personGroupId = StorageHelper.getPersonGroupId(PersonGroupManager.this);
-        personGroupName = StorageHelper.getPersonGroupName(PersonGroupManager.this);
+        personGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
+        personGroupName = StorageHelper.getPersonGroupName(HomeActivity.App);
 
         if(personGroupId.equals(" ")){
             createPersonGroup();
@@ -166,45 +234,53 @@ public class PersonGroupManager extends AppCompatActivity{
     public void onTakePictureClicked(View v) {
 
         EditText editTextPersonName = (EditText)findViewById(R.id.edit_person_name);
-        String name = editTextPersonName.getText().toString();
+        personName = editTextPersonName.getText().toString();
+        personReady = false;
 
-        if(!isNameEmpty(name)){
-            if(doesPersonExist()){
-
+        if(!isNameEmpty(personName)){
+            if(doesPersonExist(personName)){
+                personId = StorageHelper.getPersonId(personName, HomeActivity.App);
             }
             else {
                 new AddPersonTask().execute(personGroupId);
             }
+
+            takePhoto();
         }
     }
     public void onAddFromGalleryClicked(View v) {
 
         EditText editTextPersonName = (EditText)findViewById(R.id.edit_person_name);
-        String name = editTextPersonName.getText().toString();
+        personName = editTextPersonName.getText().toString();
+        personReady = false;
 
-        if(!isNameEmpty(name)){
-            if(doesPersonExist()){
-
+        if(!isNameEmpty(personName)){
+            if(doesPersonExist(personName)) {
+                personId = StorageHelper.getPersonId(personName, HomeActivity.App);
             }
             else {
                 new AddPersonTask().execute(personGroupId);
             }
+
+            selectImageInAlbum();
+
         }
     }
-    }
+
     public void onResetClicked(View v) {
 
-
+        createPersonGroup();
+        StorageHelper.deleteAll(HomeActivity.App);
     }
 
     public void createPersonGroup() {
         personGroupId = UUID.randomUUID().toString();
         personGroupName = getString(R.string.person_group_name);
 
-        StorageHelper.setPersonGroupId(personGroupId, PersonGroupManager.this);
-        StorageHelper.setPersonGroupName(personGroupName, PersonGroupManager.this);
+        StorageHelper.setPersonGroupId(personGroupId, HomeActivity.App);
+        StorageHelper.setPersonGroupName(personGroupName, HomeActivity.App);
 
-        new AddPersonGroupTask(false).execute(personGroupId);
+        new AddPersonGroupTask().execute(personGroupId);
     }
 
     public boolean isNameEmpty(String newPersonName) {
@@ -218,10 +294,9 @@ public class PersonGroupManager extends AppCompatActivity{
 
     }
 
-    public boolean doesPersonExist(){
-        EditText editTextPersonName = (EditText)findViewById(R.id.edit_person_name);
-        String newPersonName = editTextPersonName.getText().toString();
-        Set<String> personNames = StorageHelper.getAllPersonNames(PersonGroupManager.this);
+    public boolean doesPersonExist(String newPersonName){
+
+        Set<String> personNames = StorageHelper.getAllPersonNames(HomeActivity.App);
         for (String name: personNames){
             if(name.equals(newPersonName)){
                 return true;
