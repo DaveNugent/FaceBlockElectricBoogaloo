@@ -2,6 +2,7 @@ package com.example.faceblock;
 
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
@@ -70,11 +71,22 @@ public class PersonGroupManager extends AppCompatActivity{
     private Uri mUriPhotoTaken;
 
 
+    String imageUriStr;
+    Bitmap bitmap;
+
+
     public static final int PICK_IMAGE = 1;
     public static final int USE_CAMERA = 101;
 
     FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
 
+    //////////////////////////////////////////////////////////////////////////
+    //Taken and modified from Cognitive-Face sample android studio project //
+    ////////////////////////////////////////////////////////////////////////
+
+    /*
+     * Task taken from PersonGroupActivity to set up a person group in Azure
+     */
     class AddPersonGroupTask extends AsyncTask<String, String, String> {
         // Indicate the next step is to add person in this group, or finish editing this group.
 
@@ -110,6 +122,10 @@ public class PersonGroupManager extends AppCompatActivity{
         }
     }
 
+    /*
+     * Task taken from PersonActivity to add a person to the person group
+     */
+
     class AddPersonTask extends AsyncTask<String, String, String> {
         // Indicate the next step is to add face in this person, or finish editing this person.
 
@@ -123,7 +139,7 @@ public class PersonGroupManager extends AppCompatActivity{
                 publishProgress("Syncing with server to add person...");
 
                 // Start the request to creating person.
-                CreatePersonResult createPersonResult = faceServiceClient.createPersonInLargePersonGroup(
+                CreatePersonResult createPersonResult = faceServiceClient.createPerson(
                         params[0],
                         "Name",
                         "Person Info");
@@ -147,6 +163,23 @@ public class PersonGroupManager extends AppCompatActivity{
         }
     }
 
+    /*
+     * Methods bellow taken from SelectImageActivity to get face image to apply to person
+     */
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putParcelable("ImageUri", mUriPhotoTaken);
+    }
+
+    // Recover the saved state when the activity is recreated.
+    @Override
+    protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        mUriPhotoTaken = savedInstanceState.getParcelable("ImageUri");
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode)
@@ -160,10 +193,17 @@ public class PersonGroupManager extends AppCompatActivity{
                     } else {
                         imageUri = data.getData();
                     }
+
+                    imageUriStr = imageUri.toString();
+
+                    /*
+
                     Intent intent = new Intent();
                     intent.setData(imageUri);
                     setResult(RESULT_OK, intent);
                     finish();
+
+                    */
                 }
                 break;
             default:
@@ -212,8 +252,9 @@ public class PersonGroupManager extends AppCompatActivity{
 
 
 
-
-
+    /////////////////////////////////////////////////////////
+    //////////////////// Custom Methods ////////////////////
+    ///////////////////////////////////////////////////////
 
 
     @Override
