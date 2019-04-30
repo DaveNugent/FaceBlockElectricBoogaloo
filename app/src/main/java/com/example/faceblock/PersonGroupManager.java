@@ -192,7 +192,6 @@ public class PersonGroupManager extends AppCompatActivity{
         switch (requestCode)
         {
             case REQUEST_TAKE_PHOTO:
-            case REQUEST_SELECT_IMAGE_IN_ALBUM:
                 if (resultCode == RESULT_OK) {
                     System.out.println("Result OK");
                     Uri imageUri;
@@ -213,19 +212,31 @@ public class PersonGroupManager extends AppCompatActivity{
                     intent.putExtra("PersonGroupId", personGroupId);
                     intent.putExtra("ImageUriStr", imageUriStr);
                     startActivity(intent);
-
-
-
-//                    Intent intent = new Intent();
-//                    intent.setData(imageUri);
- //                   setResult(RESULT_OK, intent);
- //                   finish();
-
-
                 }
                 else{
                     System.out.println("Result Not Ok");
                 }
+                    break;
+            case REQUEST_SELECT_IMAGE_IN_ALBUM:
+                if (resultCode == RESULT_OK) {
+                    System.out.println("Result OK");
+                    Uri imageUri;
+                    imageUri = data.getData();
+                    System.out.println("Uri: " + imageUri.toString());
+                    imageUriStr = imageUri.toString();
+
+                    Intent intent = new Intent(this, AddFaceToPersonActivity.class);
+                    intent.putExtra("PersonId", personId);
+                    intent.putExtra("PersonGroupId", personGroupId);
+                    intent.putExtra("ImageUriStr", imageUriStr);
+                    startActivity(intent);
+
+                }else{
+                    System.out.println("Result Not Ok");
+                }
+
+
+
                 break;
             default:
                 System.out.println("Request has no type");
