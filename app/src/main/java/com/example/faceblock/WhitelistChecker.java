@@ -130,7 +130,7 @@ public class WhitelistChecker {
     //some method that takes a bitmap as an input param (cut out face from Dave's stuff)
     //returns a boolean based on if this face is in the list or not
 
-    public void detect(Bitmap faceThumbnail) {
+    public boolean detect(Bitmap faceThumbnail) {
 
         //We need to put the bitmap into an input stream for detection
         detected = false;
@@ -142,6 +142,8 @@ public class WhitelistChecker {
         //Starts background task to detect faces in the image
         //isOnList =
         new DetectionTask().execute(inputStream);
+
+        return detected;
 
     }
 
@@ -188,7 +190,24 @@ public class WhitelistChecker {
                 }
                 else
                 {
+                    System.out.println("*******************************************");
+                    System.out.println("*******************************************");
+                    System.out.println("*******************************************");
+                    System.out.println("*******************************************");
                     System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("HOOOORAY FACES DETECTED!");
+                    System.out.println("*******************************************");
+                    System.out.println("*******************************************");
+                    System.out.println("*******************************************");
+                    System.out.println("*******************************************");
                     detected = true;
                     identify();
                 }

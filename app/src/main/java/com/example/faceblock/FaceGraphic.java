@@ -53,8 +53,9 @@ class FaceGraphic extends GraphicOverlay.Graphic {
     private Paint mBoxPaint;
 
     private volatile Face mFace;
-    public Bitmap mFaceBitMap;
+    public volatile Bitmap mFaceBitMap;
     private int mFaceId;
+    public volatile boolean whitelisted;
 
     FaceGraphic(GraphicOverlay overlay) {
         super(overlay);
@@ -62,24 +63,28 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         mCurrentColorIndex = (mCurrentColorIndex + 1) % COLOR_CHOICES.length;
         final int selectedColor = COLOR_CHOICES[mCurrentColorIndex];
 
-        mFacePositionPaint = new Paint();
-        mFacePositionPaint.setColor(selectedColor);
+//        mFacePositionPaint = new Paint();
+//        mFacePositionPaint.setColor(selectedColor);
+//
+//        mIdPaint = new Paint();
+//        mIdPaint.setColor(selectedColor);
+//        mIdPaint.setTextSize(ID_TEXT_SIZE);
+           mBoxPaint = new Paint();
+           mBoxPaint.setColor(selectedColor);
+           mBoxPaint.setStyle(Paint.Style.STROKE);
+           mBoxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
 
-        mIdPaint = new Paint();
-        mIdPaint.setColor(selectedColor);
-        mIdPaint.setTextSize(ID_TEXT_SIZE);
-
-        mBoxPaint = new Paint();
-        mBoxPaint.setColor(selectedColor);
-        mBoxPaint.setStyle(Paint.Style.STROKE);
-        mBoxPaint.setStrokeWidth(BOX_STROKE_WIDTH);
-
-        mBoxPaint.setStyle(Paint.Style.FILL);
+           mBoxPaint.setStyle(Paint.Style.FILL);
     }
 
     void setId(int id) {
         mFaceId = id;
     }
+    public void setWhitelisted (boolean whitelisted){
+        this.whitelisted = whitelisted;
+    }
+
+
 
 
     /**
@@ -128,8 +133,10 @@ class FaceGraphic extends GraphicOverlay.Graphic {
         float right = x + xOffset;
         float bottom = y + yOffset;
 
-        return Bitmap.createBitmap(
+        this.mFaceBitMap = Bitmap.createBitmap(
                 originalBitmap, Math.round(face.getPosition().x), Math.round(face.getPosition().y),
                 Math.round(face.getHeight()), Math.round(face.getWidth()));
+
+        return this.mFaceBitMap;
     }
 }

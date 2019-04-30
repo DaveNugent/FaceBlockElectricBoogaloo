@@ -364,9 +364,9 @@ public final class FaceTrackerActivity extends AppCompatActivity {
      * Face tracker for each detected individual. This maintains a face graphic within the app's
      * associated face overlay.
      */
-    private class GraphicFaceTracker extends Tracker<Face> {
-        private GraphicOverlay mOverlay;
-        private FaceGraphic mFaceGraphic;
+    public class GraphicFaceTracker extends Tracker<Face>  {
+        public GraphicOverlay mOverlay;
+        public FaceGraphic mFaceGraphic;
 
         GraphicFaceTracker(GraphicOverlay overlay) {
             mOverlay = overlay;
@@ -379,6 +379,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
+            mFaceGraphic.setWhitelisted(false);
         }
 
         /**
@@ -387,31 +388,44 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         @Override
         public void onUpdate(FaceDetector.Detections<Face> detectionResults, Face face) {
 
-            mOverlay.add(mFaceGraphic);
-            mFaceGraphic.updateFace(face);
-            Bitmap FaceThumbNail = null;
+            if (!mFaceGraphic.whitelisted) {
+                mOverlay.add(mFaceGraphic);
+                mFaceGraphic.updateFace(face);
+                Bitmap FaceThumbNail = null;
+                Bitmap faceBit = null;
 
 
-            try {
-                Bitmap faceBit = MyFaceDetector.getLastBitmap();
+                try {
+                    faceBit = MyFaceDetector.getLastBitmap();
 
-                //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
-                if (faceBit == null){
-                    System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
+                    //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
+                    if (faceBit == null) {
+                        System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
+                    }
+                    FaceThumbNail = mFaceGraphic.generateFaceThumbnail(face, faceBit);
+                } catch (Exception e) {
+                    System.out.println("failed to get thumbnail *** " + e.toString());
+                    //FIXME probably do something
                 }
-                FaceThumbNail = mFaceGraphic.generateFaceThumbnail(face, faceBit);
-            }catch (Exception e){
-                System.out.println("failed to get thumbnail *** " + e.toString());
-                //FIXME probably do something
-            }
-            //FIXME
+                //FIXME
             /*if (FaceThumbNail != null) {
                 storeImage(FaceThumbNail);
             }*/
-            try {
-                WhitelistChecker mTask = new WhitelistChecker();
-                mTask.detect(FaceThumbNail);
-            } catch(Exception e){}
+                try {
+                    if (FaceThumbNail != null) {
+                        WhitelistChecker mTask = new WhitelistChecker();
+                        mFaceGraphic.setWhitelisted(mTask.detect(FaceThumbNail));
+                    }
+                } catch (Exception e) {
+                }
+
+            }
+
+
+        }
+
+        public void removeOverlay(){
+            mOverlay.remove(mFaceGraphic);
         }
 
         private void storeImage(Bitmap image) {
