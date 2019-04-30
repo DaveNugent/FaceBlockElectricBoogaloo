@@ -87,6 +87,7 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
             try{
                 publishProgress("Adding face...");
                 UUID personId = UUID.fromString(mPersonId);
+                System.out.println("Trying to azure face");
 
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 mBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
@@ -95,8 +96,9 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
                 for (Integer index: mFaceIndices) {
                     FaceRectangle faceRect = mFaceGridViewAdapter.faceRectList.get(index);
 
+                    System.out.println("Azuring Face");
                     // Start the request to add face.
-                    AddPersistedFaceResult result = faceServiceClient.addPersonFace(
+                    AddPersistedFaceResult result = faceServiceClient.addPersonFaceInLargePersonGroup(
                             mPersonGroupId,
                             personId,
                             imageInputStream,
@@ -107,6 +109,7 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
                 }
                 return true;
             } catch (Exception e) {
+                System.out.println("Failed to Azure Face");
                 publishProgress(e.getMessage());
 
                 return false;
@@ -115,6 +118,7 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
 
         @Override
         protected void onPreExecute() {
+            System.out.println("Sending face");
             setUiBeforeBackgroundTask();
         }
 
@@ -125,6 +129,7 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
 
         @Override
         protected void onPostExecute(Boolean result) {
+            System.out.println("Face Azured");
             setUiAfterAddingFace(result, mFaceIndices);
         }
     }
@@ -217,6 +222,7 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
                     }
                 }
             }
+            finish();
 
         }
     }
@@ -303,16 +309,20 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
     public void doneAndSave(View view) {
         if (mFaceGridViewAdapter != null) {
             List<Integer> faceIndices = new ArrayList<>();
+            System.out.println("Saving face");
 
             for (int i = 0; i < mFaceGridViewAdapter.faceRectList.size(); ++i) {
                 if (mFaceGridViewAdapter.faceChecked.get(i)) {
+                    System.out.println("Getting face");
                     faceIndices.add(i);
                 }
             }
 
             if (faceIndices.size() > 0) {
+                System.out.println("Adding face");
                 new AddFaceTask(faceIndices).execute();
             } else {
+                System.out.println("Not Adding face");
                 finish();
             }
         }

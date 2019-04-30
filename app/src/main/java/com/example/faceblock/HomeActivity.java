@@ -47,7 +47,7 @@ public class HomeActivity extends AppCompatActivity {
             try{
                 System.out.println("creating personGroup");
                 // Start creating person group in server.
-                faceServiceClient.createPersonGroup(
+                faceServiceClient.createLargePersonGroup(
                         params[0],
                         getString(R.string.person_group_name),
                         "Don't block faces");
@@ -82,6 +82,8 @@ public class HomeActivity extends AppCompatActivity {
 
         personGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
         personGroupName = StorageHelper.getPersonGroupName(HomeActivity.App);
+
+        System.out.println("PersonGroupId = /" + personGroupId + "/");
 
         if(personGroupId.equals(" ")){
             createPersonGroup();

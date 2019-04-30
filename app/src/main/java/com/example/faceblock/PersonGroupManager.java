@@ -98,7 +98,7 @@ public class PersonGroupManager extends AppCompatActivity{
 
 
                 // Start creating person group in server.
-                faceServiceClient.createPersonGroup(
+                faceServiceClient.createLargePersonGroup(
                         params[0],
                         getString(R.string.person_group_name),
                         "Don't block faces");
@@ -139,7 +139,7 @@ public class PersonGroupManager extends AppCompatActivity{
                 System.out.println("Creating Person");
 
                 // Start the request to creating person.
-                CreatePersonResult createPersonResult = faceServiceClient.createPerson(
+                CreatePersonResult createPersonResult = faceServiceClient.createPersonInLargePersonGroup(
                         params[0],
                         "Name",
                         "Person Info");
@@ -157,6 +157,7 @@ public class PersonGroupManager extends AppCompatActivity{
             if (result != null) {
                 System.out.println("Person Created");
                 personId = result;
+                System.out.println("PersonId = " + personId);
                 StorageHelper.addPerson(personName, personId, HomeActivity.App);
                 if(takePhoto){
                     takePhoto();
@@ -343,6 +344,7 @@ public class PersonGroupManager extends AppCompatActivity{
         if(!isNameEmpty(personName)){
             if(doesPersonExist(personName)) {
                 personId = StorageHelper.getPersonId(personName, HomeActivity.App);
+                System.out.println("personId = " + personId);
                 selectImageInAlbum();
             }
             else {
@@ -363,6 +365,8 @@ public class PersonGroupManager extends AppCompatActivity{
     public void createPersonGroup() {
         personGroupId = UUID.randomUUID().toString();
         personGroupName = getString(R.string.person_group_name);
+
+        System.out.println("PersonGroupId = /" + personGroupId + "/");
 
         StorageHelper.setPersonGroupId(personGroupId, HomeActivity.App);
         StorageHelper.setPersonGroupName(personGroupName, HomeActivity.App);
