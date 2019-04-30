@@ -32,6 +32,7 @@ public class WhitelistChecker {
 
     String mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
     boolean detected;
+    private boolean onWhitelist;
 
     private class IdentificationTask extends AsyncTask<UUID, String, IdentifyResult[]>{
         private boolean mSucceed = true;
@@ -92,6 +93,7 @@ public class WhitelistChecker {
                 {
                     //no match, return false
                     listener.onTaskComplete(false);
+                    onWhitelist = false;
                 }
                 else
                 {
@@ -101,11 +103,13 @@ public class WhitelistChecker {
                         //match, return true
                         System.out.println("Reached true for whitelist match");
                         listener.onTaskComplete(true);
+                        onWhitelist = true;
                     }
                     else
                     {
                         //not close enough to a match
                         listener.onTaskComplete(false);
+                        onWhitelist = false;
                     }
                 }
             }
@@ -135,6 +139,8 @@ public class WhitelistChecker {
         //We need to put the bitmap into an input stream for detection
         detected = false;
 
+        boolean onWhitelist = false;
+
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         faceThumbnail.compress(Bitmap.CompressFormat.JPEG, 100, output);
         ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
@@ -143,7 +149,7 @@ public class WhitelistChecker {
         //isOnList =
         new DetectionTask().execute(inputStream);
 
-        return detected;
+        return onWhitelist;
 
     }
 
@@ -176,6 +182,7 @@ public class WhitelistChecker {
 
             } catch (Exception e) {
                 publishProgress(e.getMessage());
+                e.printStackTrace();
                 return null;
             }
         }
@@ -184,6 +191,7 @@ public class WhitelistChecker {
         protected void onPostExecute(Face[] result) {
             if(result != null)
             {
+
                 if(result.length == 0) {
                     detected = false;
                     System.out.println("No faces detected!");

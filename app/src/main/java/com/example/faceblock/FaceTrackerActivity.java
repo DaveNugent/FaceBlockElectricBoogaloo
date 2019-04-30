@@ -405,9 +405,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                     FaceThumbNail = mFaceGraphic.generateFaceThumbnail(face, faceBit);
                 } catch (Exception e) {
                     System.out.println("failed to get thumbnail *** " + e.toString());
-                    //FIXME probably do something
                 }
-                //FIXME
             /*if (FaceThumbNail != null) {
                 storeImage(FaceThumbNail);
             }*/
@@ -417,6 +415,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                         mFaceGraphic.setWhitelisted(mTask.detect(FaceThumbNail));
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                 }
 
             }
