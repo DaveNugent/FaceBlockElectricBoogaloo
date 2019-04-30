@@ -137,6 +137,6 @@ class FaceGraphic extends GraphicOverlay.Graphic {
                 originalBitmap, Math.round(face.getPosition().x), Math.round(face.getPosition().y),
                 Math.round(face.getHeight()), Math.round(face.getWidth()));
 
-        return this.mFaceBitMap.createScaledBitmap(this.mFaceBitMap, 120, 120, false);
+        return this.mFaceBitMap;
     }
 }

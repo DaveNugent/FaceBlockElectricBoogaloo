@@ -55,6 +55,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.example.faceblock.helper.ImageHelper;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.CameraSource;
@@ -396,7 +397,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
 
                 try {
-                    faceBit = MyFaceDetector.getLastBitmap();
+                    faceBit = ImageHelper.rotateBitmap(MyFaceDetector.getLastBitmap(), 90);
 
                     //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
                     if (faceBit == null) {
@@ -413,6 +414,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                     if (FaceThumbNail != null) {
                         WhitelistChecker mTask = new WhitelistChecker();
                         mFaceGraphic.setWhitelisted(mTask.detect(FaceThumbNail));
+                        storeImage(FaceThumbNail);
                     }
                 } catch (Exception e) {
                     e.printStackTrace();

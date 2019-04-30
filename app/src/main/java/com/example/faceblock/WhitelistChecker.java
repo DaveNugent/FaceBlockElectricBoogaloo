@@ -155,7 +155,7 @@ public class WhitelistChecker {
 
 
     public void identify() {
-        if (detected && mPersonGroupId != null) {
+        if (mPersonGroupId != null) {
             List<UUID> faceIds = new ArrayList<>();
             new IdentificationTask(mPersonGroupId).execute(
                     faceIds.toArray(new UUID[faceIds.size()]));
@@ -198,24 +198,7 @@ public class WhitelistChecker {
                 }
                 else
                 {
-                    System.out.println("*******************************************");
-                    System.out.println("*******************************************");
-                    System.out.println("*******************************************");
-                    System.out.println("*******************************************");
                     System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("HOOOORAY FACES DETECTED!");
-                    System.out.println("*******************************************");
-                    System.out.println("*******************************************");
-                    System.out.println("*******************************************");
-                    System.out.println("*******************************************");
                     detected = true;
                     identify();
                 }
