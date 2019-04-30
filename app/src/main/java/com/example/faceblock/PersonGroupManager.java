@@ -306,8 +306,7 @@ public class PersonGroupManager extends AppCompatActivity{
         protected void onPostExecute(String result) {
 
             if (result != null) {
-                Toast toast = Toast.makeText(HomeActivity.App, "Training Complete!", Toast.LENGTH_SHORT);
-                toast.show();
+                Toast.makeText(HomeActivity.App, "Training Complete!", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -391,8 +390,7 @@ public class PersonGroupManager extends AppCompatActivity{
 
     public void onTrainClicked(View v){
         new TrainPersonGroupTask().execute(personGroupId);
-        Toast toast = Toast.makeText(HomeActivity.App, "Training Whitelist...", Toast.LENGTH_SHORT);
-        toast.show();
+        Toast.makeText(HomeActivity.App, "Training Whitelist...", Toast.LENGTH_SHORT).show();
     }
 
     public void createPersonGroup() {
@@ -411,12 +409,11 @@ public class PersonGroupManager extends AppCompatActivity{
 
         if (newPersonName.equals("")) {
             System.out.println("Name Empty");
+
             Toast.makeText(this, "Please enter Name", Toast.LENGTH_SHORT).show();
             return true;
         }
         else {
-            Toast toast = Toast.makeText(HomeActivity.App, "Please Enter A Name", Toast.LENGTH_SHORT);
-            toast.show();
             return false;
         }
 
