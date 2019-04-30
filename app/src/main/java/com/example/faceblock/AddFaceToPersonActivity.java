@@ -265,7 +265,6 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
         }
 
         mProgressDialog = new ProgressDialog(this);
-        mProgressDialog.setTitle(getString(R.string.progress_dialog_title));
     }
 
     @Override

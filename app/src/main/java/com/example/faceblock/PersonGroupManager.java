@@ -42,6 +42,7 @@ import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.CreatePersonResult;
 
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -65,7 +66,7 @@ public class PersonGroupManager extends AppCompatActivity{
     private static final int REQUEST_SELECT_IMAGE_IN_ALBUM = 1;
 
     // The URI of photo taken with camera
-    private Uri mUriPhotoTaken;
+    public Uri mUriPhotoTaken;
 
 
     String imageUriStr;
@@ -195,16 +196,17 @@ public class PersonGroupManager extends AppCompatActivity{
                 if (resultCode == RESULT_OK) {
                     System.out.println("Result OK");
                     Uri imageUri;
-                    if (data == null || data.getData() == null) {
+                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+                    if (photo == null){
                         System.out.println("Intent returned null");
-                        imageUri = mUriPhotoTaken;
                     } else {
                         System.out.println("Data returned");
-                        imageUri = data.getData();
+                        imageUri = getImageUri(this, photo);
                         System.out.println("Uri: " + imageUri.toString());
+                        imageUriStr = imageUri.toString();
                     }
 
-                    imageUriStr = imageUri.toString();
+
 
                     Intent intent = new Intent(this, AddFaceToPersonActivity.class);
                     intent.putExtra("PersonId", personId);
@@ -231,6 +233,13 @@ public class PersonGroupManager extends AppCompatActivity{
         }
     }
 
+    public Uri getImageUri(Context inContext, Bitmap inImage) {
+        ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+        inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
+        String path = MediaStore.Images.Media.insertImage(inContext.getContentResolver(), inImage, "Title", null);
+        return Uri.parse(path);
+    }
+
     // When the button of "Take a Photo with Camera" is pressed.
     public void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
@@ -242,7 +251,6 @@ public class PersonGroupManager extends AppCompatActivity{
 //                mUriPhotoTaken = Uri.fromFile(file);
 //                intent.putExtra(MediaStore.EXTRA_OUTPUT, mUriPhotoTaken);
 //                startActivityForResult(intent, REQUEST_TAKE_PHOTO);
-
    //             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
                 System.out.println("Request take photo");
                 startActivityForResult(intent, REQUEST_TAKE_PHOTO);
