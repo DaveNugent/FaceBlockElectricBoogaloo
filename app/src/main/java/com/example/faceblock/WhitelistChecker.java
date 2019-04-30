@@ -1,5 +1,6 @@
-<<<<<<< HEAD
 package com.example.faceblock;
+
+//<<<<<<< HEAD
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -7,6 +8,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
 
+import com.example.faceblock.FaceServiceHelper;
+import com.example.faceblock.HomeActivity;
+import com.example.faceblock.OnTaskCompleteListener;
 import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;
 import com.microsoft.projectoxford.face.contract.Face;
@@ -170,6 +174,7 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
 
     }
 }
+/*
 =======
 package com.example.faceblock;
 
@@ -342,3 +347,4 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
     }
 }
 >>>>>>> 49a7d6bf0a15b585122b11597e43b42468681142
+*/
