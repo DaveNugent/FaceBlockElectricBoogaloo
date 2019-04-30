@@ -30,7 +30,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class WhitelistChecker {
 
-    String mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
+    String mPersonGroupId;
     boolean detected;
     private boolean onWhitelist;
 
@@ -46,8 +46,10 @@ public class WhitelistChecker {
         @Override
         protected IdentifyResult[] doInBackground(UUID... params) {
 
+            System.out.println("reached IdentifyResult before");
+
             FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
-            //mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
+            mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
 
             System.out.println("reached IdentifyResult");
 
@@ -65,6 +67,7 @@ public class WhitelistChecker {
 
                 return faceServiceClient.identityInPersonGroup(WhitelistChecker.this.mPersonGroupId, params, 1);
             } catch (Exception e) {
+                e.printStackTrace();
                 mSucceed = false;
                 return null;
             }
@@ -155,7 +158,9 @@ public class WhitelistChecker {
 
 
     public void identify() {
+        mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
         if (mPersonGroupId != null) {
+            System.out.println("personGroup ID = " + mPersonGroupId.toString());
             List<UUID> faceIds = new ArrayList<>();
             new IdentificationTask(mPersonGroupId).execute(
                     faceIds.toArray(new UUID[faceIds.size()]));
