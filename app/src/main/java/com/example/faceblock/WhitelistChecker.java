@@ -132,7 +132,6 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
             List<UUID> faceIds = new ArrayList<>();
             new IdentificationTask(mPersonGroupId).execute(
                     faceIds.toArray(new UUID[faceIds.size()]));
-            )
         }
     }
 
