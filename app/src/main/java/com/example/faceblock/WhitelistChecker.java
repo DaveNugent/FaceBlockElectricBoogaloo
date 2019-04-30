@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.view.View;
 
 import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;
@@ -14,6 +15,7 @@ import com.microsoft.projectoxford.face.contract.TrainingStatus;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -21,6 +23,8 @@ import java.util.UUID;
 import static android.app.Activity.RESULT_OK;
 
 public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> {
+
+    //private class IdentificationTask extends AsyncTask<UUID, String, IdentifyResult[]>{}
 
     private OnTaskCompleteListener listener;
 //    public WhitelistChecker(OnTaskCompleteListener listener){
@@ -123,7 +127,20 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
 
     }
 
+    /*
+    public void identify(View view) {
+        if (detected && mPersonGroupId != null) {
+            List<UUID> faceIds = new ArrayList<>();
+            new IdentificationTask(mPersonGroupId).execute(
+                    faceIds.toArray(new UUID[faceIds.size()]));
+            )
+        }
+    }*/
+
     private class DetectionTask extends AsyncTask<InputStream, String, Face[]> {
+
+        String mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
+
         @Override
         protected Face[] doInBackground(InputStream... params) {
             //Get an instance of face service client to detect faces in image
