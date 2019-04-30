@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.example.faceblock.helper.SampleApp;
 import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;
+import com.microsoft.projectoxford.face.FaceServiceRestClient;
 
 import java.util.UUID;
 
@@ -25,6 +26,12 @@ public class HomeActivity extends AppCompatActivity {
 
     public static Context App;
 
+ //   public static FaceServiceClient getFaceServiceClient() {
+ //       return sFaceServiceClient;
+ //   }
+
+ //   private static FaceServiceClient sFaceServiceClient;
+
 
     class AddPersonGroupTask extends AsyncTask<String, String, String> {
         // Indicate the next step is to add person in this group, or finish editing this group.
@@ -36,11 +43,11 @@ public class HomeActivity extends AppCompatActivity {
 
             // Get an instance of face service client.
             FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
-            try{
-                publishProgress("Syncing with server to add person group...");
 
+            try{
+                System.out.println("creating personGroup");
                 // Start creating person group in server.
-                faceServiceClient.createPersonGroup(
+                faceServiceClient.createLargePersonGroup(
                         params[0],
                         getString(R.string.person_group_name),
                         "Don't block faces");
@@ -57,6 +64,7 @@ public class HomeActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
 
             if (result != null) {
+                System.out.println("Person Group created");
 
             }
         }
@@ -68,8 +76,14 @@ public class HomeActivity extends AppCompatActivity {
         App = getApplicationContext();
         setContentView(R.layout.activity_home);
 
+//        if(sFaceServiceClient == null) {
+       //     sFaceServiceClient = new FaceServiceRestClient(getString(R.string.endpoint), getString(R.string.subscription_key));
+//       }
+
         personGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
         personGroupName = StorageHelper.getPersonGroupName(HomeActivity.App);
+
+        System.out.println("PersonGroupId = /" + personGroupId + "/");
 
         if(personGroupId.equals(" ")){
             createPersonGroup();
@@ -81,7 +95,7 @@ public class HomeActivity extends AppCompatActivity {
         btnAddWL.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent intent = new Intent(HomeActivity.this, AddWLActivity.class);
+                Intent intent = new Intent(HomeActivity.this, PersonGroupManager.class);
                 startActivity(intent);
             }
         });
@@ -99,13 +113,11 @@ public class HomeActivity extends AppCompatActivity {
         personGroupId = UUID.randomUUID().toString();
         personGroupName = getString(R.string.person_group_name);
 
+        System.out.println("persongroupid = " + personGroupId);
+
         StorageHelper.setPersonGroupId(personGroupId, App);
         StorageHelper.setPersonGroupName(personGroupName, App);
 
         new HomeActivity.AddPersonGroupTask().execute(personGroupId);
-    }
-
-    public static Context getContext(){
-        return App;
     }
 }
