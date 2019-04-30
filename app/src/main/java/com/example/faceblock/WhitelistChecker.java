@@ -127,13 +127,13 @@ public class WhitelistChecker extends AsyncTask<UUID, String, IdentifyResult[]> 
 
     }
 
-    public void identify(View view) {
-        if (detected && mPersonGroupId != null) {
-            List<UUID> faceIds = new ArrayList<>();
-            new IdentificationTask(mPersonGroupId).execute(
-                    faceIds.toArray(new UUID[faceIds.size()]));
-        }
-    }
+//    public void identify(View view) {
+//        if (detected && mPersonGroupId != null) {
+//            List<UUID> faceIds = new ArrayList<>();
+//            new IdentificationTask(mPersonGroupId).execute(
+//                    faceIds.toArray(new UUID[faceIds.size()]));
+//        }
+//    }
 
     private class DetectionTask extends AsyncTask<InputStream, String, Face[]> {
 

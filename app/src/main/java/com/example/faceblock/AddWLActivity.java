@@ -90,9 +90,19 @@ public class AddWLActivity extends AppCompatActivity {
     {
         if (requestCode == PICK_IMAGE) {
             Toast.makeText(AddWLActivity.this, "You picked an image", Toast.LENGTH_SHORT).show();
+            try {
+                InputStream inputStream = this.getContentResolver().openInputStream(data.getData());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
         else if (requestCode == USE_CAMERA){
             Toast.makeText(AddWLActivity.this, "You took a picture", Toast.LENGTH_SHORT).show();
+            try {
+                InputStream inputStream = this.getContentResolver().openInputStream(data.getData());
+            }catch (Exception e){
+                e.printStackTrace();
+            }
         }
     }
 
