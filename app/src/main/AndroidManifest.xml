@@ -12,11 +12,14 @@
     <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
+        android:name=".helper.SampleApp"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:label="FaceBlock"
         android:theme="@style/Theme.AppCompat">
         <activity android:name=".AddWLActivity"></activity>
+        <activity android:name=".PersonGroupManager"></activity>
+        <activity android:name=".AddFaceToPersonActivity"></activity>
 
         <meta-data
             android:name="com.google.android.gms.version"
@@ -41,6 +44,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <uses-library android:name="org.apache.http.legacy" android:required="false" />
     </application>
 
 </manifest>

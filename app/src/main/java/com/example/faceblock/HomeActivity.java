@@ -12,6 +12,7 @@ import android.widget.Toast;
 import com.example.faceblock.helper.SampleApp;
 import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;
+import com.microsoft.projectoxford.face.FaceServiceRestClient;
 
 import java.util.UUID;
 
@@ -25,6 +26,12 @@ public class HomeActivity extends AppCompatActivity {
 
     public static Context App;
 
+ //   public static FaceServiceClient getFaceServiceClient() {
+ //       return sFaceServiceClient;
+ //   }
+
+ //   private static FaceServiceClient sFaceServiceClient;
+
 
     class AddPersonGroupTask extends AsyncTask<String, String, String> {
         // Indicate the next step is to add person in this group, or finish editing this group.
@@ -36,9 +43,9 @@ public class HomeActivity extends AppCompatActivity {
 
             // Get an instance of face service client.
             FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
-            try{
-                publishProgress("Syncing with server to add person group...");
 
+            try{
+                System.out.println("creating personGroup");
                 // Start creating person group in server.
                 faceServiceClient.createPersonGroup(
                         params[0],
@@ -57,6 +64,7 @@ public class HomeActivity extends AppCompatActivity {
         protected void onPostExecute(String result) {
 
             if (result != null) {
+                System.out.println("Person Group created");
 
             }
         }
@@ -67,6 +75,10 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         App = getApplicationContext();
         setContentView(R.layout.activity_home);
+
+//        if(sFaceServiceClient == null) {
+       //     sFaceServiceClient = new FaceServiceRestClient(getString(R.string.endpoint), getString(R.string.subscription_key));
+//       }
 
         personGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
         personGroupName = StorageHelper.getPersonGroupName(HomeActivity.App);
@@ -98,6 +110,8 @@ public class HomeActivity extends AppCompatActivity {
     public void createPersonGroup() {
         personGroupId = UUID.randomUUID().toString();
         personGroupName = getString(R.string.person_group_name);
+
+        System.out.println("persongroupid = " + personGroupId);
 
         StorageHelper.setPersonGroupId(personGroupId, App);
         StorageHelper.setPersonGroupName(personGroupName, App);
