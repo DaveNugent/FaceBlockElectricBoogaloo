@@ -96,7 +96,7 @@ public class AddFaceToPersonActivity extends AppCompatActivity {
                     FaceRectangle faceRect = mFaceGridViewAdapter.faceRectList.get(index);
 
                     // Start the request to add face.
-                    AddPersistedFaceResult result = faceServiceClient.addPersonFaceInLargePersonGroup(
+                    AddPersistedFaceResult result = faceServiceClient.addPersonFace(
                             mPersonGroupId,
                             personId,
                             imageInputStream,
