@@ -411,6 +411,7 @@ public class PersonGroupManager extends AppCompatActivity{
 
         if (newPersonName.equals("")) {
             System.out.println("Name Empty");
+            Toast.makeText(this, "Please enter Name", Toast.LENGTH_SHORT).show();
             return true;
         }
         else {
