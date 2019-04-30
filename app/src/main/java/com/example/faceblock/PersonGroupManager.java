@@ -52,6 +52,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import android.content.Context;
+import android.widget.Toast;
 
 
 public class PersonGroupManager extends AppCompatActivity{
@@ -282,6 +283,34 @@ public class PersonGroupManager extends AppCompatActivity{
     }
 
 
+    class TrainPersonGroupTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            // Get an instance of face service client.
+            FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
+            try{
+
+
+                faceServiceClient.trainLargePersonGroup(params[0]);
+                return params[0];
+            } catch (Exception e) {
+
+                return null;
+            }
+        }
+
+
+        @Override
+        protected void onPostExecute(String result) {
+
+            if (result != null) {
+                Toast toast = Toast.makeText(HomeActivity.App, "Training Complete!", Toast.LENGTH_SHORT);
+                toast.show();
+            }
+        }
+    }
 
 
 
@@ -356,10 +385,14 @@ public class PersonGroupManager extends AppCompatActivity{
     }
 
     public void onResetClicked(View v) {
-
-
         createPersonGroup();
         StorageHelper.deleteAll(HomeActivity.App);
+    }
+
+    public void onTrainClicked(View v){
+        new TrainPersonGroupTask().execute(personGroupId);
+        Toast toast = Toast.makeText(HomeActivity.App, "Training Whitelist...", Toast.LENGTH_SHORT);
+        toast.show();
     }
 
     public void createPersonGroup() {
@@ -381,6 +414,8 @@ public class PersonGroupManager extends AppCompatActivity{
             return true;
         }
         else {
+            Toast toast = Toast.makeText(HomeActivity.App, "Please Enter A Name", Toast.LENGTH_SHORT);
+            toast.show();
             return false;
         }
 
