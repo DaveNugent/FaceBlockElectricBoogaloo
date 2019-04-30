@@ -415,8 +415,6 @@ public class PersonGroupManager extends AppCompatActivity{
             return true;
         }
         else {
-            Toast toast = Toast.makeText(HomeActivity.App, "Please Enter A Name", Toast.LENGTH_SHORT);
-            toast.show();
             return false;
         }
 
