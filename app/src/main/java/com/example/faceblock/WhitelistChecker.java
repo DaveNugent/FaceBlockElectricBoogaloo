@@ -59,13 +59,13 @@ public class WhitelistChecker {
                 //personGroupID
                 //faceIDs
                 //MaxNumOfCandidatesReturned
-                TrainingStatus trainingStatus = faceServiceClient.getPersonGroupTrainingStatus(WhitelistChecker.this.mPersonGroupId);
+                TrainingStatus trainingStatus = faceServiceClient.getLargePersonGroupTrainingStatus(WhitelistChecker.this.mPersonGroupId);
                 if (trainingStatus.status != TrainingStatus.Status.Succeeded) {
                     mSucceed = false;
                     return null;
                 }
 
-                return faceServiceClient.identityInPersonGroup(WhitelistChecker.this.mPersonGroupId, params, 1);
+                return faceServiceClient.identityInLargePersonGroup(WhitelistChecker.this.mPersonGroupId, params, 1);
             } catch (Exception e) {
                 e.printStackTrace();
                 mSucceed = false;
@@ -95,7 +95,7 @@ public class WhitelistChecker {
                 if(result == null)
                 {
                     //no match, return false
-                    listener.onTaskComplete(false);
+//                    listener.onTaskComplete(false);
                     onWhitelist = false;
                 }
                 else
@@ -105,13 +105,14 @@ public class WhitelistChecker {
                     {
                         //match, return true
                         System.out.println("Reached true for whitelist match");
-                        listener.onTaskComplete(true);
+                        System.out.println(result[0].candidates.get(0).confidence );
+//                        listener.onTaskComplete(true);
                         onWhitelist = true;
                     }
                     else
                     {
                         //not close enough to a match
-                        listener.onTaskComplete(false);
+//                        listener.onTaskComplete(false);
                         onWhitelist = false;
                     }
                 }
@@ -127,7 +128,7 @@ public class WhitelistChecker {
         }
     }
 
-    private OnTaskCompleteListener listener;
+//    private OnTaskCompleteListener listener;
 //    public WhitelistChecker(OnTaskCompleteListener listener){
 //        this.listener = listener;
 //    }
@@ -157,11 +158,14 @@ public class WhitelistChecker {
     }
 
 
-    public void identify() {
+    public void identify(Face[] faces) {
         mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
         if (mPersonGroupId != null) {
             System.out.println("personGroup ID = " + mPersonGroupId.toString());
             List<UUID> faceIds = new ArrayList<>();
+            for(Face face: faces){
+                faceIds.add(face.faceId);
+            }
             new IdentificationTask(mPersonGroupId).execute(
                     faceIds.toArray(new UUID[faceIds.size()]));
         }
@@ -205,7 +209,7 @@ public class WhitelistChecker {
                 {
                     System.out.println("HOOOORAY FACES DETECTED!");
                     detected = true;
-                    identify();
+                    identify(result);
                 }
             }
             else {
