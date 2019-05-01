@@ -32,9 +32,16 @@ public class WhitelistChecker {
 
     String mPersonGroupId;
     boolean detected;
-    private boolean onWhitelist;
+    private volatile boolean onWhitelist;
+    FaceGraphic mFaceGraphic;
+
+    WhitelistChecker(FaceGraphic faceGraphic){
+        this.mFaceGraphic = faceGraphic;
+    }
 
     private class IdentificationTask extends AsyncTask<UUID, String, IdentifyResult[]>{
+
+
         private boolean mSucceed = true;
         private static final double CANDIDATE_THRESHOLD = 0.5;
         String mPersonGroupId;
@@ -87,34 +94,40 @@ public class WhitelistChecker {
             afterIdentification(result, mSucceed);
         }
 
+        public boolean getBool(){
+            return onWhitelist;
+        }
+
         public void afterIdentification(IdentifyResult[] result, boolean succeed)
         {
             System.out.println("reached afterIdentification");
-            if(succeed)
-            {
-                if(result == null)
-                {
-                    //no match, return false
+            if(succeed) {
+                try {
+                    if (result == null) {
+                        //no match, return false
 //                    listener.onTaskComplete(false);
-                    onWhitelist = false;
-                }
-                else
-                {
-                    //evaluate confidence value of first (top) candidate
-                    if(result[0].candidates.get(0).confidence > CANDIDATE_THRESHOLD)
-                    {
-                        //match, return true
-                        System.out.println("Reached true for whitelist match");
-                        System.out.println(result[0].candidates.get(0).confidence );
-//                        listener.onTaskComplete(true);
-                        onWhitelist = true;
-                    }
-                    else
-                    {
-                        //not close enough to a match
-//                        listener.onTaskComplete(false);
                         onWhitelist = false;
+                    } else {
+                        //evaluate confidence value of first (top) candidate
+                        if (result[0].candidates.get(0).confidence > CANDIDATE_THRESHOLD) {
+                            //match, return true
+                            System.out.println("Reached true for whitelist match");
+                            System.out.println(result[0].candidates.get(0).confidence);
+//                        listener.onTaskComplete(true);
+                            onWhitelist = true;
+                            mFaceGraphic.setWhitelisted(true);
+                            System.out.println("set Whitelisted to true");
+                        } else {
+                            //not close enough to a match
+//                        listener.onTaskComplete(false);
+                            onWhitelist = false;
+                            System.out.println("Reached false for whitelist match");
+                            System.out.println(result[0].candidates.get(0).confidence);
+                            mFaceGraphic.setWhitelisted(false);
+                        }
                     }
+                } catch (Exception e){
+                    e.printStackTrace();
                 }
             }
             else
@@ -143,7 +156,7 @@ public class WhitelistChecker {
         //We need to put the bitmap into an input stream for detection
         detected = false;
 
-        boolean onWhitelist = false;
+        onWhitelist = true;
 
         ByteArrayOutputStream output = new ByteArrayOutputStream();
         faceThumbnail.compress(Bitmap.CompressFormat.JPEG, 100, output);

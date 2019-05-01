@@ -381,6 +381,33 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         public void onNewItem(int faceId, Face item) {
             mFaceGraphic.setId(faceId);
             mFaceGraphic.setWhitelisted(false);
+
+            Bitmap FaceThumbNail = null;
+            Bitmap faceBit = null;
+
+
+            try {
+                faceBit = ImageHelper.rotateBitmap(MyFaceDetector.getLastBitmap(), 90);
+
+                //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
+                if (faceBit == null) {
+                    System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
+                }
+                FaceThumbNail = mFaceGraphic.generateFaceThumbnail(item, faceBit);
+            } catch (Exception e) {
+                System.out.println("failed to get thumbnail *** " + e.toString());
+            }
+            /*if (FaceThumbNail != null) {
+                storeImage(FaceThumbNail);
+            }*/
+            try {
+                if (FaceThumbNail != null) {
+                    WhitelistChecker mTask = new WhitelistChecker(mFaceGraphic);
+                    boolean test = mTask.detect(FaceThumbNail);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         /**
@@ -392,33 +419,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             if (!mFaceGraphic.whitelisted) {
                 mOverlay.add(mFaceGraphic);
                 mFaceGraphic.updateFace(face);
-                Bitmap FaceThumbNail = null;
-                Bitmap faceBit = null;
 
-
-                try {
-                    faceBit = ImageHelper.rotateBitmap(MyFaceDetector.getLastBitmap(), 90);
-
-                    //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
-                    if (faceBit == null) {
-                        System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
-                    }
-                    FaceThumbNail = mFaceGraphic.generateFaceThumbnail(face, faceBit);
-                } catch (Exception e) {
-                    System.out.println("failed to get thumbnail *** " + e.toString());
-                }
-            /*if (FaceThumbNail != null) {
-                storeImage(FaceThumbNail);
-            }*/
-                try {
-                    if (FaceThumbNail != null) {
-                        WhitelistChecker mTask = new WhitelistChecker();
-                        mFaceGraphic.setWhitelisted(mTask.detect(FaceThumbNail));
-                        storeImage(FaceThumbNail);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
 
             }
 
