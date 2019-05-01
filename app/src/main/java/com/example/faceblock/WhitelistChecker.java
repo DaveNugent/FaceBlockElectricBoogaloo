@@ -123,7 +123,7 @@ public class WhitelistChecker {
                             onWhitelist = false;
                             //System.out.println("Reached false for whitelist match");
                             //System.out.println(result[0].candidates.get(0).confidence);
-                            mFaceGraphic.setWhitelisted(false);
+                            //mFaceGraphic.setWhitelisted(false);
                         }
                     }
                 } catch (Exception e){
