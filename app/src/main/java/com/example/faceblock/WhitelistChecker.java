@@ -53,12 +53,12 @@ public class WhitelistChecker {
         @Override
         protected IdentifyResult[] doInBackground(UUID... params) {
 
-            System.out.println("reached IdentifyResult before");
+           // System.out.println("reached IdentifyResult before");
 
             FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
             mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
 
-            System.out.println("reached IdentifyResult");
+            //System.out.println("reached IdentifyResult");
 
             try {
                 //API call
@@ -83,13 +83,13 @@ public class WhitelistChecker {
         @Override
         protected void onPreExecute()
         {
-            System.out.println("reached PreExecute");
+            //System.out.println("reached PreExecute");
         }
 
         @Override
         protected void onPostExecute(IdentifyResult[] result)
         {
-            System.out.println("reached PostExecute");
+           // System.out.println("reached PostExecute");
 
             afterIdentification(result, mSucceed);
         }
@@ -100,7 +100,7 @@ public class WhitelistChecker {
 
         public void afterIdentification(IdentifyResult[] result, boolean succeed)
         {
-            System.out.println("reached afterIdentification");
+           // System.out.println("reached afterIdentification");
             if(succeed) {
                 try {
                     if (result == null) {
@@ -111,18 +111,18 @@ public class WhitelistChecker {
                         //evaluate confidence value of first (top) candidate
                         if (result[0].candidates.get(0).confidence > CANDIDATE_THRESHOLD) {
                             //match, return true
-                            System.out.println("Reached true for whitelist match");
-                            System.out.println(result[0].candidates.get(0).confidence);
+                            //System.out.println("Reached true for whitelist match");
+                            //System.out.println(result[0].candidates.get(0).confidence);
 //                        listener.onTaskComplete(true);
                             onWhitelist = true;
                             mFaceGraphic.setWhitelisted(true);
-                            System.out.println("set Whitelisted to true");
+                            //System.out.println("set Whitelisted to true");
                         } else {
                             //not close enough to a match
 //                        listener.onTaskComplete(false);
                             onWhitelist = false;
-                            System.out.println("Reached false for whitelist match");
-                            System.out.println(result[0].candidates.get(0).confidence);
+                            //System.out.println("Reached false for whitelist match");
+                            //System.out.println(result[0].candidates.get(0).confidence);
                             mFaceGraphic.setWhitelisted(false);
                         }
                     }
@@ -132,7 +132,7 @@ public class WhitelistChecker {
             }
             else
             {
-                System.out.println("failed mSucceed");
+                //System.out.println("failed mSucceed");
             }
         }
 
@@ -174,7 +174,7 @@ public class WhitelistChecker {
     public void identify(Face[] faces) {
         mPersonGroupId = StorageHelper.getPersonGroupId(HomeActivity.App);
         if (mPersonGroupId != null) {
-            System.out.println("personGroup ID = " + mPersonGroupId.toString());
+            //System.out.println("personGroup ID = " + mPersonGroupId.toString());
             List<UUID> faceIds = new ArrayList<>();
             for(Face face: faces){
                 faceIds.add(face.faceId);
@@ -216,11 +216,11 @@ public class WhitelistChecker {
 
                 if(result.length == 0) {
                     detected = false;
-                    System.out.println("No faces detected!");
+                    //System.out.println("No faces detected!");
                 }
                 else
                 {
-                    System.out.println("HOOOORAY FACES DETECTED!");
+                   // System.out.println("HOOOORAY FACES DETECTED!");
                     detected = true;
                     identify(result);
                 }

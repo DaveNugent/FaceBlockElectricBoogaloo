@@ -391,11 +391,11 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
                 //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
                 if (faceBit == null) {
-                    System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
+                   //System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
                 }
                 FaceThumbNail = mFaceGraphic.generateFaceThumbnail(item, faceBit);
             } catch (Exception e) {
-                System.out.println("failed to get thumbnail *** " + e.toString());
+                //System.out.println("failed to get thumbnail *** " + e.toString());
             }
             /*if (FaceThumbNail != null) {
                 storeImage(FaceThumbNail);
@@ -419,8 +419,8 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             if (!mFaceGraphic.whitelisted) {
                 mOverlay.add(mFaceGraphic);
                 mFaceGraphic.updateFace(face);
-
-
+            } else {
+                removeOverlay();
             }
 
 
