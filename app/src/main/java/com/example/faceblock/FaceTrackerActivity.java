@@ -65,11 +65,10 @@ import java.nio.ByteBuffer;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-//import android.support.v7.widget.;
 
 /**
- * Activity for the face tracker app.  This app detects faces with the rear facing camera, and draws
- * overlay graphics to indicate the position, size, and ID of each face.
+ * This Activity contains many modified functions from the android example
+ * face tracker app.
  */
 public final class FaceTrackerActivity extends AppCompatActivity {
     private static final String TAG = "FaceTracker";
@@ -163,9 +162,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     }
 
     /**
-     * Handles the requesting of the camera permission.  This includes
-     * showing a "Snackbar" message of why the permission is needed then
-     * sending the request.
+     * Handles the requesting of the camera permission.
      */
     private void requestCameraPermission() {
         Log.w(TAG, "Camera permission is not granted. Requesting permission");
@@ -187,16 +184,9 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                         RC_HANDLE_CAMERA_PERM);
             }
         };
-
-//        Snackbar.make(mGraphicOverlay, "I need permissions!!!!!!",
-//                Snackbar.LENGTH_INDEFINITE)
-//                .setAction("ok", listener)
-//                .show();
     }
     /**
-     * Creates and starts the camera.  Note that this uses a higher resolution in comparison
-     * to other detection examples to enable the barcode detector to detect small barcodes
-     * at long distances.
+     * Creates and starts the camera.
      */
     private void createCameraSource() {
 
@@ -212,17 +202,11 @@ public final class FaceTrackerActivity extends AppCompatActivity {
                         .build());
 
         if (!myFaceDetector.isOperational()) {
-            // Note: The first time that an app using face API is installed on a device, GMS will
-            // download a native library to the device in order to do detection.  Usually this
-            // completes before the app is run for the first time.  But if that download has not yet
-            // completed, then the above call will not detect any faces.
-            //
-            // isOperational() can be used to check if the required native library is currently
-            // available.  The detector will automatically become operational once the library
-            // download completes on device.
             Log.w(TAG, "Face detector dependencies are not yet available.");
         }
 
+        // currently we just hardcode it to be the back facing camera with
+        // more time we could give the user the option to swap it to front facing
         mCameraSource = new CameraSource.Builder(context, myFaceDetector)
                 .setRequestedPreviewSize(640, 480)
                 .setFacing(CameraSource.CAMERA_FACING_BACK)
@@ -249,34 +233,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         mPreview.stop();
     }
 
-    /**
-     * Releases the resources associated with the camera source, the associated detector, and the
-     * rest of the processing pipeline.
-     */
-//    @Override
-//    protected void onDestroy() {
-//        super.onDestroy();
-//        if (mCameraSource != null) {
-//            mCameraSource.release();
-//        }
-//    }
 
-    /**
-     * Callback for the result from requesting permissions. This method
-     * is invoked for every call on {@link #requestPermissions(String[], int)}.
-     * <p>
-     * <strong>Note:</strong> It is possible that the permissions request interaction
-     * with the user is interrupted. In this case you will receive empty permissions
-     * and results arrays which should be treated as a cancellation.
-     * </p>
-     *
-     * @param requestCode  The request code passed in {@link #requestPermissions(String[], int)}.
-     * @param permissions  The requested permissions. Never null.
-     * @param grantResults The grant results for the corresponding permissions
-     *                     which is either {@link PackageManager#PERMISSION_GRANTED}
-     *                     or {@link PackageManager#PERMISSION_DENIED}. Never null.
-     * @see #requestPermissions(String[], int)
-     */
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
@@ -313,9 +270,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
     //==============================================================================================
 
     /**
-     * Starts or restarts the camera source, if it exists.  If the camera source doesn't exist yet
-     * (e.g., because onResume was called before the camera source was created), this will be called
-     * again when the camera source is created.
+     * Starts or restarts the camera source, if it exists.
      */
     private void startCameraSource() {
 
@@ -382,17 +337,13 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             try {
                 faceBit = ImageHelper.rotateBitmap(MyFaceDetector.getLastBitmap(), 90);
 
-                //Bitmap faceBit = BitmapFactory.decodeResource(getResources(), MediaRecorder.VideoSource.SURFACE);
                 if (faceBit == null) {
-                   //System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
+                   System.out.println("Facebit is NULL!!!!!!!!!!!!!!!!!!!");
                 }
                 FaceThumbNail = mFaceGraphic.generateFaceThumbnail(item, faceBit);
             } catch (Exception e) {
-                //System.out.println("failed to get thumbnail *** " + e.toString());
+                System.out.println("failed to get thumbnail *** " + e.toString());
             }
-            /*if (FaceThumbNail != null) {
-                storeImage(FaceThumbNail);
-            }*/
             try {
                 if (FaceThumbNail != null) {
                     WhitelistChecker mTask = new WhitelistChecker(mFaceGraphic);
@@ -423,49 +374,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             mOverlay.remove(mFaceGraphic);
         }
 
-        private void storeImage(Bitmap image) {
-            File pictureFile = getOutputMediaFile();
-            if (pictureFile == null) {
-                Log.d("myFaceDetector",
-                        "Error creating media file, check storage permissions: ");// e.getMessage());
-                return;
-            }
-            try {
-                FileOutputStream fos = new FileOutputStream(pictureFile);
-                image.compress(Bitmap.CompressFormat.PNG, 90, fos);
-                fos.close();
-            } catch (FileNotFoundException e) {
-                Log.d("myFaceDetector", "File not found: " + e.getMessage());
-            } catch (IOException e) {
-                Log.d("myFaceDetector", "Error accessing file: " + e.getMessage());
-            }
-        }
-
-        /** Create a File for saving an image or video */
-        private  File getOutputMediaFile(){
-            // To be safe, you should check that the SDCard is mounted
-            // using Environment.getExternalStorageState() before doing this.
-            File mediaStorageDir = new File(Environment.getExternalStorageDirectory()
-                    + "/Android/data/"
-                    + "FaceBlock"
-                    + "/Files");
-
-            // This location works best if you want the created images to be shared
-            // between applications and persist after your app has been uninstalled.
-
-            // Create the storage directory if it does not exist
-            if (! mediaStorageDir.exists()){
-                if (! mediaStorageDir.mkdirs()){
-                    return null;
-                }
-            }
-            // Create a media file name
-            String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(new Date());
-            File mediaFile;
-            String mImageName="MI_"+ timeStamp +".jpg";
-            mediaFile = new File(mediaStorageDir.getPath() + File.separator + mImageName);
-            return mediaFile;
-        }
 
         /**
          * Hide the graphic when the corresponding face was not detected.  This can happen for
@@ -536,7 +444,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         try {
             mMediaRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
             mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.SURFACE);
-            //mMediaRecorder.setVideoSource(MediaRecorder.VideoSource.CAMERA);
             mMediaRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
             Long currTime = System.currentTimeMillis();
             String fileName = "/" + String.valueOf(currTime) + "_video.mp4";
@@ -614,6 +521,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
 
 
     @Override
+    // we make sure to remove camera source, since if we are holding it no on else can use it
     public void onDestroy() {
         super.onDestroy();
         destroyMediaProjection();
@@ -621,6 +529,7 @@ public final class FaceTrackerActivity extends AppCompatActivity {
             mCameraSource.release();
         }
     }
+
 
     @Override
     public void onBackPressed() {
@@ -649,15 +558,6 @@ public final class FaceTrackerActivity extends AppCompatActivity {
         Uri contentUri = Uri.fromFile(f);
         mediaScanIntent.setData(contentUri);
         this.sendBroadcast(mediaScanIntent);
-    }
-
-    public static byte[] getDataFromImage(Image image) {
-        Image.Plane[] planes = image.getPlanes();
-        ByteBuffer buffer = planes[0].getBuffer();
-        byte[] data = new byte[buffer.capacity()];
-        buffer.get(data);
-
-        return data;
     }
 
 

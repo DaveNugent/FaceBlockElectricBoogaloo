@@ -1,6 +1,5 @@
 package com.example.faceblock;
 
-//<<<<<<< HEAD
 
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -16,7 +15,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -86,9 +84,6 @@ public class WhitelistChecker {
             afterIdentification(result, mSucceed);
         }
 
-        public boolean getBool(){
-            return onWhitelist;
-        }
 
         public void afterIdentification(IdentifyResult[] result, boolean succeed)
         {
@@ -97,24 +92,17 @@ public class WhitelistChecker {
                 try {
                     if (result == null) {
                         //no match, return false
-//                    listener.onTaskComplete(false);
                         onWhitelist = false;
                     } else {
                         //evaluate confidence value of first (top) candidate
                         if (result[0].candidates.get(0).confidence > CANDIDATE_THRESHOLD) {
                             //match, return true
-                            //System.out.println("Reached true for whitelist match");
-                            //System.out.println(result[0].candidates.get(0).confidence);
-//                        listener.onTaskComplete(true);
                             onWhitelist = true;
                             mFaceGraphic.setWhitelisted(true);
                             //System.out.println("set Whitelisted to true");
                         } else {
                             //not close enough to a match
-//                        listener.onTaskComplete(false);
                             onWhitelist = false;
-                            //System.out.println("Reached false for whitelist match");
-                            //System.out.println(result[0].candidates.get(0).confidence);
                             //mFaceGraphic.setWhitelisted(false);
                         }
                     }
@@ -128,15 +116,7 @@ public class WhitelistChecker {
             }
         }
 
-        public void setIdentificationResult(IdentifyResult[] identifyResults) {
-            List<IdentifyResult> mIdentifyResults = Arrays.asList(identifyResults);
-        }
     }
-
-//    private OnTaskCompleteListener listener;
-//    public WhitelistChecker(OnTaskCompleteListener listener){
-//        this.listener = listener;
-//    }
 
 
     //Checks through Azure API to see if it is on whitelist or not
@@ -155,7 +135,6 @@ public class WhitelistChecker {
         ByteArrayInputStream inputStream = new ByteArrayInputStream(output.toByteArray());
 
         //Starts background task to detect faces in the image
-        //isOnList =
         new DetectionTask().execute(inputStream);
 
         return onWhitelist;
