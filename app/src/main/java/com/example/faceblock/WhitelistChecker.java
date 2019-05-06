@@ -2,15 +2,9 @@ package com.example.faceblock;
 
 //<<<<<<< HEAD
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.view.View;
 
-import com.example.faceblock.FaceServiceHelper;
-import com.example.faceblock.HomeActivity;
-import com.example.faceblock.OnTaskCompleteListener;
 import com.example.faceblock.helper.SampleApp;
 import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;
@@ -25,8 +19,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-
-import static android.app.Activity.RESULT_OK;
 
 public class WhitelistChecker {
 

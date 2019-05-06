@@ -52,7 +52,6 @@ import android.widget.TextView;
 
 
 import com.example.faceblock.helper.ImageHelper;
-import com.example.faceblock.helper.LogHelper;
 import com.example.faceblock.helper.SampleApp;
 import com.example.faceblock.helper.StorageHelper;
 import com.microsoft.projectoxford.face.FaceServiceClient;

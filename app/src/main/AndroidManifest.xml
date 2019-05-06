@@ -17,7 +17,6 @@
         android:hardwareAccelerated="true"
         android:label="FaceBlock"
         android:theme="@style/Theme.AppCompat">
-        <activity android:name=".AddWLActivity"></activity>
         <activity android:name=".PersonGroupManager"></activity>
         <activity android:name=".AddFaceToPersonActivity"></activity>
 
