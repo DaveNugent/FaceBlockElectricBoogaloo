@@ -46,11 +46,6 @@ public class PersonGroupManager extends AppCompatActivity{
     //Taken and modified from Cognitive-Face sample android studio project //
     ////////////////////////////////////////////////////////////////////////
 
-    /*
-
-     */
-
-
      /*
       * Task taken from PersonGroupActivity to set up a person group in Azure
       */
