@@ -34,16 +34,11 @@ public class PersonGroupManager extends AppCompatActivity{
     private static final int REQUEST_TAKE_PHOTO = 0;
     private static final int REQUEST_SELECT_IMAGE_IN_ALBUM = 1;
 
-    // The URI of photo taken with camera
+    /* The URI of photo taken with camera */
     public Uri mUriPhotoTaken;
 
 
     String imageUriStr;
-    Bitmap bitmap;
-
-
-    public static final int PICK_IMAGE = 1;
-    public static final int USE_CAMERA = 101;
 
     FaceServiceClient faceServiceClient;
 
@@ -51,26 +46,28 @@ public class PersonGroupManager extends AppCompatActivity{
     //Taken and modified from Cognitive-Face sample android studio project //
     ////////////////////////////////////////////////////////////////////////
 
+    /*
 
-     // Task taken from PersonGroupActivity to set up a person group in Azure
+     */
 
+
+     /*
+      * Task taken from PersonGroupActivity to set up a person group in Azure
+      */
     class AddPersonGroupTask extends AsyncTask<String, String, String> {
-        // Indicate the next step is to add person in this group, or finish editing this group.
 
         AddPersonGroupTask() { }
 
         @Override
         protected String doInBackground(String... params) {
 
-            // Get an instance of face service client.
+            /* Get an instance of face service client. */
             try{
-
-
-                // Start creating person group in server.
+                /* Start creating person group in server. */
                 faceServiceClient.createLargePersonGroup(
-                        params[0],
-                        getString(R.string.person_group_name),
-                        "Don't block faces");
+                        params[0], //UUID String to be new PersonGroup id
+                        getString(R.string.person_group_name), //PersonGroup name in Azure
+                        "Don't block faces"); //PersonGroup description in Azure
 
                 return params[0];
             } catch (Exception e) {
@@ -78,41 +75,33 @@ public class PersonGroupManager extends AppCompatActivity{
                 return null;
             }
         }
-
-
-        @Override
-        protected void onPostExecute(String result) {
-
-            if (result != null) {
-
-            }
-        }
     }
 
 
-     // Task taken from PersonActivity to add a person to the person group
-
-
+     /*
+      * Task taken from PersonActivity to add a person to the person group
+      */
     class AddPersonTask extends AsyncTask<String, String, String> {
-        // Indicate the next step is to add face in this person, or finish editing this person.
 
+        //determines which method to use to add a face to the new person
         boolean takePhoto;
 
         AddPersonTask (boolean take) {takePhoto = take;}
 
         @Override
         protected String doInBackground(String... params) {
-            // Get an instance of face service client.
+            /* Get an instance of face service client. */
             try{
-                System.out.println("param[0] = " + params[0]);
-                System.out.println("Creating Person");
+                //System.out.println("param[0] = " + params[0]);
+                //System.out.println("Creating Person");
 
-                // Start the request to creating person.
+                /* Start the request to creating person. */
                 CreatePersonResult createPersonResult = faceServiceClient.createPersonInLargePersonGroup(
-                        params[0],
-                        "Name",
-                        "Person Info");
+                        params[0], //UUID String of PersonGroup
+                        "Name", //Name of person in Azure
+                        "Person Info"); //Person info in Azure
 
+                /* Returns the created person's UUID as a string */
                 return createPersonResult.personId.toString();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -124,9 +113,11 @@ public class PersonGroupManager extends AppCompatActivity{
         protected void onPostExecute(String result) {
 
             if (result != null) {
-                System.out.println("Person Created");
+                //System.out.println("Person Created");
                 personId = result;
-                System.out.println("PersonId = " + personId);
+                //System.out.println("PersonId = " + personId);
+
+                /* Store the personID */
                 StorageHelper.addPerson(personName, personId, HomeActivity.App);
                 if(takePhoto){
                     takePhoto();
@@ -140,8 +131,9 @@ public class PersonGroupManager extends AppCompatActivity{
     }
 
 
-     // Methods bellow taken from SelectImageActivity to get face image to apply to person
-
+    /*
+     * Methods bellow taken from SelectImageActivity to get face image to apply to person
+     */
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {
@@ -149,34 +141,36 @@ public class PersonGroupManager extends AppCompatActivity{
         outState.putParcelable("ImageUri", mUriPhotoTaken);
     }
 
-    // Recover the saved state when the activity is recreated.
+    /* Recover the saved state when the activity is recreated. */
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
         mUriPhotoTaken = savedInstanceState.getParcelable("ImageUri");
     }
 
+    /* Handles results from taking photo and selecting photo from gallery */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        System.out.println("ActivityResult");
+        //System.out.println("ActivityResult");
         switch (requestCode)
         {
             case REQUEST_TAKE_PHOTO:
                 if (resultCode == RESULT_OK) {
-                    System.out.println("Result OK");
+                    //System.out.println("Result OK");
+
+                    /* Get image bitmap from Activity Result and get the Uri String of bitmap */
                     Uri imageUri;
                     Bitmap photo = (Bitmap) data.getExtras().get("data");
                     if (photo == null){
-                        System.out.println("Intent returned null");
+                       // System.out.println("Intent returned null");
                     } else {
-                        System.out.println("Data returned");
+                       // System.out.println("Data returned");
                         imageUri = getImageUri(this, photo);
-                        System.out.println("Uri: " + imageUri.toString());
+                        //System.out.println("Uri: " + imageUri.toString());
                         imageUriStr = imageUri.toString();
                     }
 
-
-
+                    /* Start intent to add face to Person in Azure using Uri String */
                     Intent intent = new Intent(this, AddFaceToPersonActivity.class);
                     intent.putExtra("PersonId", personId);
                     intent.putExtra("PersonGroupId", personGroupId);
@@ -184,17 +178,20 @@ public class PersonGroupManager extends AppCompatActivity{
                     startActivity(intent);
                 }
                 else{
-                    System.out.println("Result Not Ok");
+                   // System.out.println("Result Not Ok");
                 }
                     break;
             case REQUEST_SELECT_IMAGE_IN_ALBUM:
                 if (resultCode == RESULT_OK) {
-                    System.out.println("Result OK");
+                    //System.out.println("Result OK");
+
+                    /* Get the Image Uri String */
                     Uri imageUri;
                     imageUri = data.getData();
-                    System.out.println("Uri: " + imageUri.toString());
+                    //System.out.println("Uri: " + imageUri.toString());
                     imageUriStr = imageUri.toString();
 
+                    /* Start intent to add face to Person in Azure using Uri String */
                     Intent intent = new Intent(this, AddFaceToPersonActivity.class);
                     intent.putExtra("PersonId", personId);
                     intent.putExtra("PersonGroupId", personGroupId);
@@ -202,18 +199,19 @@ public class PersonGroupManager extends AppCompatActivity{
                     startActivity(intent);
 
                 }else{
-                    System.out.println("Result Not Ok");
+                    //System.out.println("Result Not Ok");
                 }
 
 
 
                 break;
             default:
-                System.out.println("Request has no type");
+               // System.out.println("Request has no type");
                 break;
         }
     }
 
+    /* Gets image Uri from a bitmap */
     public Uri getImageUri(Context inContext, Bitmap inImage) {
         ByteArrayOutputStream bytes = new ByteArrayOutputStream();
         inImage.compress(Bitmap.CompressFormat.JPEG, 100, bytes);
@@ -221,19 +219,14 @@ public class PersonGroupManager extends AppCompatActivity{
         return Uri.parse(path);
     }
 
-    // When the button of "Take a Photo with Camera" is pressed.
+    /* When the button of "Take a Photo with Camera" is pressed. */
     public void takePhoto() {
         Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
         if(intent.resolveActivity(getPackageManager()) != null) {
-            // Save the photo taken to a temporary file.
- //           File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+
+            /* Sends intent to take a picture */
             try {
-//                File file = File.createTempFile("IMG_", ".jpg", storageDir);
-//                mUriPhotoTaken = Uri.fromFile(file);
-//                intent.putExtra(MediaStore.EXTRA_OUTPUT, mUriPhotoTaken);
-//                startActivityForResult(intent, REQUEST_TAKE_PHOTO);
-   //             Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                System.out.println("Request take photo");
+                //System.out.println("Request take photo");
                 startActivityForResult(intent, REQUEST_TAKE_PHOTO);
             } catch (Exception e) {
                     e.printStackTrace();
@@ -241,8 +234,9 @@ public class PersonGroupManager extends AppCompatActivity{
         }
     }
 
-    // When the button of "Select a Photo in Album" is pressed.
+    /* When the button of "Select a Photo in Album" is pressed. */
     public void selectImageInAlbum() {
+        /* Send intent to get picture from album */
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         if (intent.resolveActivity(getPackageManager()) != null) {
@@ -250,17 +244,18 @@ public class PersonGroupManager extends AppCompatActivity{
         }
     }
 
-
+    /*
+     * Task taken from PersonGroupActivity to train the person group in Azure for face identification
+     */
     class TrainPersonGroupTask extends AsyncTask<String, String, String> {
 
         @Override
         protected String doInBackground(String... params) {
 
-            // Get an instance of face service client.
+            /* Get an instance of face service client. */
             FaceServiceClient faceServiceClient = SampleApp.getFaceServiceClient();
             try{
-
-
+                /* Tell Azure to train PersonGroup using the personGroupId */
                 faceServiceClient.trainLargePersonGroup(params[0]);
                 return params[0];
             } catch (Exception e) {
@@ -280,20 +275,6 @@ public class PersonGroupManager extends AppCompatActivity{
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     /////////////////////////////////////////////////////////
     //////////////////// Custom Methods ////////////////////
     ///////////////////////////////////////////////////////
@@ -309,7 +290,7 @@ public class PersonGroupManager extends AppCompatActivity{
         editTextPersonName = (EditText)findViewById(R.id.edit_person_name);
         faceServiceClient = SampleApp.getFaceServiceClient();
 
-        System.out.println("personGroupId = " + personGroupId);
+        //System.out.println("personGroupId = " + personGroupId);
 
 
     }
@@ -317,7 +298,7 @@ public class PersonGroupManager extends AppCompatActivity{
     public void onTakePictureClicked(View v) {
 
         personName = editTextPersonName.getText().toString();
-        System.out.println("Take Picture for: " + personName);
+        //System.out.println("Take Picture for: " + personName);
 
         if(!isNameEmpty(personName)){
             if(doesPersonExist(personName)){
@@ -325,47 +306,52 @@ public class PersonGroupManager extends AppCompatActivity{
                 takePhoto();
             }
             else {
-                System.out.println("Create new Person");
+                //System.out.println("Create new Person");
                 new AddPersonTask(true).execute(personGroupId);
             }
         }
     }
+
     public void onAddFromGalleryClicked(View v) {
 
-
         personName = editTextPersonName.getText().toString();
-
-        System.out.println("Get Picture for: " + personName);
+        //System.out.println("Get Picture for: " + personName);
 
         if(!isNameEmpty(personName)){
             if(doesPersonExist(personName)) {
                 personId = StorageHelper.getPersonId(personName, HomeActivity.App);
-                System.out.println("personId = " + personId);
+                //System.out.println("personId = " + personId);
                 selectImageInAlbum();
             }
             else {
-                System.out.println("Create new Person");
+                //System.out.println("Create new Person");
                 new AddPersonTask(false).execute(personGroupId);
             }
 
         }
     }
 
+    /*
+     * Resets whitelist
+     * Currently does so by creating a new PersonGroup without deleting the old one.
+     */
     public void onResetClicked(View v) {
-        createPersonGroup();
         StorageHelper.deleteAll(HomeActivity.App);
+        createPersonGroup();
     }
 
+    /* Trains Persongroup for face identification */
     public void onTrainClicked(View v){
         new TrainPersonGroupTask().execute(personGroupId);
         Toast.makeText(HomeActivity.App, "Training Whitelist...", Toast.LENGTH_SHORT).show();
     }
 
+    /* Method to create new personGroup when reset is pressed */
     public void createPersonGroup() {
         personGroupId = UUID.randomUUID().toString();
         personGroupName = getString(R.string.person_group_name);
 
-        System.out.println("PersonGroupId = /" + personGroupId + "/");
+        //System.out.println("PersonGroupId = /" + personGroupId + "/");
 
         StorageHelper.setPersonGroupId(personGroupId, HomeActivity.App);
         StorageHelper.setPersonGroupName(personGroupName, HomeActivity.App);
@@ -373,10 +359,11 @@ public class PersonGroupManager extends AppCompatActivity{
         new AddPersonGroupTask().execute(personGroupId);
     }
 
+    /* Method to determine if the "Enter Name" is empty and if so tells user to enter a name  */
     public boolean isNameEmpty(String newPersonName) {
 
         if (newPersonName.equals("")) {
-            System.out.println("Name Empty");
+            //System.out.println("Name Empty");
 
             Toast.makeText(this, "Please enter Name", Toast.LENGTH_SHORT).show();
             return true;
@@ -387,33 +374,19 @@ public class PersonGroupManager extends AppCompatActivity{
 
     }
 
+    /* Method to check if person already exists */
     public boolean doesPersonExist(String newPersonName){
 
         Set<String> personNames = StorageHelper.getAllPersonNames(HomeActivity.App);
         for (String name: personNames){
             if(name.equals(newPersonName)){
-                System.out.println(newPersonName + " does exist");
+                //System.out.println(newPersonName + " does exist");
                 return true;
             }
         }
-        System.out.println(newPersonName + " doesn't exist");
+       // System.out.println(newPersonName + " doesn't exist");
         return false;
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
